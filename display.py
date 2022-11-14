@@ -29,6 +29,7 @@ class Display:
     #This function calls all the different display functions.
     def display(self) -> None:
         self.display_buffer()
+        self.display_cursor()
 
 
     #Displays the buffer.
@@ -52,3 +53,18 @@ class Display:
             display_y += 1
             if display_y > end_y:
                 break
+
+
+    #Displays the cursor
+    def display_cursor(self) -> None:
+        cursor_char = " "
+        cursor_y = self.cursor.get_y()
+        cursor_x = self.cursor.get_x()
+
+        if cursor_x != len(self.buffer.get_line(cursor_y)) - 1:
+            cursor_char = self.buffer.get_char(cursor_y, cursor_x)
+
+        try:
+            self.editor.stdscr.addstr(cursor_y, cursor_x, "|", self.editor.get_colour("BLACK_WHITE"))
+        except:
+            raise Exception("Y: {} X: {}".format(cursor_y, cursor_x))

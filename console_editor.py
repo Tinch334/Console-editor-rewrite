@@ -1,8 +1,8 @@
-import utils, curses, curses.ascii, time
+import utils, curses, curses.ascii
+
 from buffer import TextBuffer
 from cursor import Cursor
 from display import Display
-
 
 class TextEditor(utils.CursesUtils):
     def __init__(self):
@@ -28,8 +28,7 @@ class TextEditor(utils.CursesUtils):
         while 1:
             #Clear the screen
             self.stdscr.clear()
-            #Refresh the screen
-            self.stdscr.refresh()
+            
 
             #Get and process key input.
             self.get_input()
@@ -45,7 +44,7 @@ class TextEditor(utils.CursesUtils):
                 quit()
 
 
-            self.stdscr.addstr(5, 0, str(self.key), self.get_colour("WHITE_BLACK"))
+            self.stdscr.addstr(5, 0, "Y: {} X: {}".format(self.cursor.get_y(), self.cursor.get_x()), self.get_colour("WHITE_BLACK"))
 
 
             #Get console size.
@@ -61,8 +60,13 @@ class TextEditor(utils.CursesUtils):
             return
 
         if curses.ascii.isalnum(self.key) or curses.ascii.isblank(self.key):
-            self.buffer.add_char(chr(self.key), self.cursor.get_y())
+            self.buffer.add_char(chr(self.key), self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(True, self.buffer)
+
+
+        elif curses.ascii.ctrl(self.key):
+            self.buffer.delete_char(self.cursor.get_y(), self.cursor.get_x())
+            self.cursor.change_x_pos(False, self.buffer)
 
         
 

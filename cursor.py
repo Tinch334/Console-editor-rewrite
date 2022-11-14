@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from buffer import TextBuffer
 
 
@@ -51,10 +52,10 @@ class Cursor:
         new_pos = self.x_pos + (1 if (change) else -1)
 
         #The cursor doesn't get to either end of the line.
-        if new_pos < len(buffer.get_line(self.y_pos)):
+        if new_pos < len(buffer.get_line(self.y_pos)) + 1 and new_pos >= 0:
             self.x_pos = new_pos
+        #Otherwise we check to see if we can move the cursor vertically to the next/previous line accordingly.
         else:
-            #Otherwise we check to see if we can move the cursor vertically to the next/previous line accordingly.
             if change:
                 if self.y_pos + 1 < buffer.get_line_count():
                     self.y_pos += 1
