@@ -7,9 +7,10 @@ class Line:
     contents: str = ""
 
 
-@dataclass
+
 class TextBuffer:
-    buffer: List[Line] = field(default_factory = list)
+    def __init__(self):
+        self.buffer = [Line()]
 
     #####USE NOTE#####
     #All the functions in this dataclass use indexes starting at zero. Furthermore when referring to the "x_pos" in a line it must be thought of
@@ -18,7 +19,7 @@ class TextBuffer:
 
     #Adds a character in the specified position in the buffer, returns "True" if no errors occurred. To insert the character at the end of the
     #specified line leave or set "x_pos" to "None".
-    def add_char(self, char: str, y_pos: int, x_pos: Optional[int]) -> bool:
+    def add_char(self, char: str, y_pos: int, x_pos: Optional[int] = None) -> bool:
         try:
             if x_pos == None:
                 self.buffer[y_pos].contents += char
@@ -37,7 +38,7 @@ class TextBuffer:
 
     #Deletes the character behind the cursor, returns "True" if no errors occurred. To delete the character at the end of the specified line
     #leave or set "x_pos" to "None".
-    def delete_char(self, char: str, y_pos: int, x_pos: Optional[int]) -> bool:
+    def delete_char(self, char: str, y_pos: int, x_pos: Optional[int] = None) -> bool:
         try:
             #If a line is empty we delete it.
             if (len(self.buffer[y_pos].contents)) == 0:
@@ -59,14 +60,14 @@ class TextBuffer:
             return False
 
 
-    def delete_char_forward(self, char: str, y_pos: int, x_pos: int = None) -> bool:
+    def delete_char_forward(self, char: str, y_pos: int, x_pos: Optional[int] = None) -> bool:
         pass
 
 
     #Inserts a newline behind the cursor, returns "True" if no errors occurred. To insert it at the end of the specified line leave
     #or set "x_pos" to "None". Note that newline doesn't refer to the newline character "\n" but to what would happen when pressing
     #enter on a regular editor.
-    def newline(self, y_pos: int, x_pos: int = None) -> bool:
+    def newline(self, y_pos: int, x_pos: Optional[int] = None) -> bool:
         try:
             #Insert a new line right after the current one.
             self.buffer.insert(y_pos + 1, Line())

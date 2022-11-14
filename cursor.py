@@ -56,7 +56,7 @@ class Cursor:
         else:
             #Otherwise we check to see if we can move the cursor vertically to the next/previous line accordingly.
             if change:
-                if self.y_pos + 1 < buffer.get_line_count:
+                if self.y_pos + 1 < buffer.get_line_count():
                     self.y_pos += 1
                     self.x_pos = 0
             else:
