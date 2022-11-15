@@ -61,10 +61,7 @@ class Display:
         cursor_y = self.cursor.get_y()
         cursor_x = self.cursor.get_x()
 
-        if cursor_x != len(self.buffer.get_line(cursor_y)) - 1:
+        if cursor_x != len(self.buffer.get_line(cursor_y)) and len(self.buffer.get_line(cursor_y)) != 0:
             cursor_char = self.buffer.get_char(cursor_y, cursor_x)
 
-        try:
-            self.editor.stdscr.addstr(cursor_y, cursor_x, "|", self.editor.get_colour("BLACK_WHITE"))
-        except:
-            raise Exception("Y: {} X: {}".format(cursor_y, cursor_x))
+        self.editor.stdscr.addstr(cursor_y, cursor_x, cursor_char, self.editor.get_colour("BLACK_WHITE"))

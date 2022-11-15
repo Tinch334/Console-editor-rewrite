@@ -70,7 +70,7 @@ class TextBuffer:
             #new line.
             if (len(self.buffer[y_pos].contents)) != 0:
                 self.buffer[y_pos + 1].contents = self.buffer[y_pos].contents[x_pos:]
-                self.buffer[y_pos].contents = self.buffer[y_pos].contents[:x_pos - 1]
+                self.buffer[y_pos].contents = self.buffer[y_pos].contents[:x_pos]
 
             return True
 
@@ -81,7 +81,7 @@ class TextBuffer:
     #Returns the character in the specified position if possible, otherwise returns "None".
     def get_char(self, y_pos: int, x_pos: int) -> Optional[str]:
         try:
-            return self.buffer[y_pos].contents[x_pos + 1]
+            return self.buffer[y_pos].contents[x_pos]
 
         except:
             return None

@@ -56,19 +56,42 @@ class TextEditor(utils.CursesUtils):
 
 
     def get_input(self) -> None:
-        if self.key == (-1):
+        #We use the "key" variable to avoid accessing the class variable repeated times.
+        key = self.key
+
+        #The function "getch" returns "(-1)" when no key was pressed.
+        if key == (-1):
             return
 
-        if curses.ascii.isalnum(self.key) or curses.ascii.isblank(self.key):
-            self.buffer.add_char(chr(self.key), self.cursor.get_y(), self.cursor.get_x())
+        #####Input keys#####
+        if curses.ascii.isalnum(key) or curses.ascii.isblank(key):
+            self.buffer.add_char(chr(key), self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(True, self.buffer)
 
-
-        elif curses.ascii.ctrl(self.key):
+        #Backspace
+        elif key == 8:
             self.buffer.delete_char(self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(False, self.buffer)
 
-        
+        #Enter
+        elif key == 10 or key == 13 or key == curses.KEY_ENTER:
+            self.buffer.newline(self.cursor.get_y(), self.cursor.get_x())
+            #When the enter key is pressed we move the cursor down one line and then set it to the start of the line
+            self.cursor.change_y_pos(1, self.buffer)
+            self.cursor.cursor_start()
+
+        #####Cursor movement keys#####
+        elif key == curses.KEY_RIGHT:
+            self.cursor.change_x_pos(True, self.buffer)
+
+        elif key == curses.KEY_LEFT:
+            self.cursor.change_x_pos(False, self.buffer)
+
+        elif key == curses.KEY_UP:
+            self.cursor.change_y_pos(-1, self.buffer)
+
+        elif key == curses.KEY_DOWN:
+            self.cursor.change_y_pos(1, self.buffer)
 
 
 editor = TextEditor()
