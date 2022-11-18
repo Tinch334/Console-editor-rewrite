@@ -45,6 +45,7 @@ class TextEditor(utils.CursesUtils):
 
 
             self.stdscr.addstr(5, 0, "Y: {} X: {}".format(self.cursor.get_y(), self.cursor.get_x()), self.get_colour("WHITE_BLACK"))
+            self.stdscr.addstr(6, 0, "SUPR: {}".format(curses.KEY_DC), self.get_colour("WHITE_BLACK"))
 
 
             #Get console size.
@@ -64,17 +65,28 @@ class TextEditor(utils.CursesUtils):
             return
 
         #####Input keys#####
-        if curses.ascii.isalnum(key) or curses.ascii.isblank(key):
+        #Printable characters, this range covers all of extended ASCII, including symbols.
+        if key >= 32 and key <= 253:
             self.buffer.add_char(chr(key), self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(True, self.buffer)
 
         #Backspace
-        elif key == 8:
-            self.buffer.delete_char(self.cursor.get_y(), self.cursor.get_x())
-            self.cursor.change_x_pos(False, self.buffer)
+        elif key == curses.ascii.BS:
+            #The reason we store the old cursor position is so we can modify the cursor, by calling "change_x_pos", before trying to delete a
+            #character. We do this to solve a problem that would occur when deleting at the end of a line. What would occur is that the cursor
+            #would get positioned at the end of the new line because "change_x_pos" uses the length of the line to get it's position.
+            old_y = self.cursor.get_y()
+            old_x = self.cursor.get_x()
 
-        #Enter
-        elif key == 10 or key == 13 or key == curses.KEY_ENTER:
+            self.cursor.change_x_pos(False, self.buffer)
+            self.buffer.delete_char(old_y, old_x)
+
+        #Supr
+        elif key == curses.KEY_DC:
+            self.buffer.delete_char_forward(self.cursor.get_y(), self.cursor.get_x())
+
+        #Enter, to detect it we use the ASCII "Carriage return(CR)" and "Line feed(LF)", both are included for compatibility reasons.
+        elif key == curses.ascii.CR or key == curses.ascii.LF:
             self.buffer.newline(self.cursor.get_y(), self.cursor.get_x())
             #When the enter key is pressed we move the cursor down one line and then set it to the start of the line
             self.cursor.change_y_pos(1, self.buffer)

@@ -17,8 +17,7 @@ class TextBuffer:
     #as if it were a cursor. What this means is that an "x_pos" of zero would be at the very start of the line, NOT the first character.
 
 
-    #Adds a character in the specified position in the buffer, returns "True" if no errors occurred. To insert the character at the end of the
-    #specified line leave or set "x_pos" to "None".
+    #Adds a character in the specified position in the buffer, returns "True" if no errors occurred.
     def add_char(self, char: str, y_pos: int, x_pos: int) -> bool:
         try:
             if x_pos == 0:
@@ -33,8 +32,7 @@ class TextBuffer:
             return False
 
 
-    #Deletes the character behind the cursor, returns "True" if no errors occurred. To delete the character at the end of the specified line
-    #leave or set "x_pos" to "None".
+    #Deletes the character behind the cursor, returns "True" if no errors occurred.
     def delete_char(self, y_pos: int, x_pos: int) -> bool:
         try:
             #If we delete the first position of a line we simply append it to the line above, if there's one. This also works for deleting
@@ -54,20 +52,32 @@ class TextBuffer:
             return False
 
 
-    def delete_char_forward(self, char: str, y_pos: int, x_pos: int) -> bool:
-        pass
+    #Deletes the character in front of the cursor, returns "True" if no errors occurred.
+    def delete_char_forward(self, y_pos: int, x_pos: int) -> bool:
+        try:
+            #If there are any characters in front of the character in the current line we delete them.
+            if x_pos < len(self.buffer[y_pos].contents):
+                self.buffer[y_pos].contents = self.buffer[y_pos].contents[:x_pos] + self.buffer[y_pos].contents[x_pos + 1:]
+            #Otherwise we check if there's a line beneath the current one and append it to it.
+            elif len(self.buffer) > y_pos + 1:
+                self.buffer[y_pos].contents += self.buffer[y_pos + 1].contents
+                self.buffer.pop(y_pos + 1)
+
+            return True
+
+        except:
+            return False
 
 
-    #Inserts a newline behind the cursor, returns "True" if no errors occurred. To insert it at the end of the specified line leave
-    #or set "x_pos" to "None". Note that newline doesn't refer to the newline character "\n" but to what would happen when pressing
-    #enter on a regular editor.
+    #Inserts a newline behind the cursor, returns "True" if no errors occurred. Note that newline doesn't refer to the newline character "\n"
+    #but to what would happen when pressing enter on a regular editor.
     def newline(self, y_pos: int, x_pos: int) -> bool:
         try:
             #Insert a new line right after the current one.
             self.buffer.insert(y_pos + 1, Line())
 
-            #If the current line isn't empty we slice it, leaving everything behind the cursor on it and putting everything in front of it in the
-            #new line.
+            #If the current line isn't empty we slice it, leaving everything behind the cursor on it and putting everything in front of it in 
+            #the new line.
             if (len(self.buffer[y_pos].contents)) != 0:
                 self.buffer[y_pos + 1].contents = self.buffer[y_pos].contents[x_pos:]
                 self.buffer[y_pos].contents = self.buffer[y_pos].contents[:x_pos]

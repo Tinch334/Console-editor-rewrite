@@ -25,12 +25,13 @@ class Cursor:
     #Changes the X position of the cursor, if "change" is "True" then the cursor is moved one position to the right, otherwise it's moved one
     #position to the left.
     def change_x_pos(self, change: bool, buffer: type[TextBuffer]) -> None:
-        new_pos = self.x_pos + (1 if (change) else -1)
+        new_pos = self.x_pos + (1 if change else -1)
 
-        #The cursor doesn't get to either end of the line.
-        if new_pos < len(buffer.get_line(self.y_pos)) + 1 and new_pos >= 0:
+        #First we check that the line we are trying to check exists, this is to deal with the case where we delete the last line. Then we check
+        #that the cursor doesn't get to either end of the line.
+        if buffer.get_line(self.y_pos) != None and new_pos < len(buffer.get_line(self.y_pos)) + 1 and new_pos >= 0:
             self.x_pos = new_pos
-        #Otherwise we check to see if we can move the cursor vertically to the next/previous line accordingly.
+            #Otherwise we check to see if we can move the cursor vertically to the next/previous line accordingly.
         else:
             if change:
                 if self.y_pos + 1 < buffer.get_line_count():
