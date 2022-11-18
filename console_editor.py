@@ -60,7 +60,7 @@ class TextEditor(utils.CursesUtils):
         #We use the "key" variable to avoid accessing the class variable repeated times.
         key = self.key
 
-        #The function "getch" returns "(-1)" when no key was pressed.
+        #In non-blocking mode the function "getch" returns "(-1)" when no key was pressed.
         if key == (-1):
             return
 
@@ -85,7 +85,7 @@ class TextEditor(utils.CursesUtils):
         elif key == curses.KEY_DC:
             self.buffer.delete_char_forward(self.cursor.get_y(), self.cursor.get_x())
 
-        #Enter, to detect it we use the ASCII "Carriage return(CR)" and "Line feed(LF)", both are included for compatibility reasons.
+        #Enter, to detect it we use the ASCII "Carriage return(CR)" or "Line feed(LF)", both are included for compatibility reasons.
         elif key == curses.ascii.CR or key == curses.ascii.LF:
             self.buffer.newline(self.cursor.get_y(), self.cursor.get_x())
             #When the enter key is pressed we move the cursor down one line and then set it to the start of the line
@@ -104,6 +104,19 @@ class TextEditor(utils.CursesUtils):
 
         elif key == curses.KEY_DOWN:
             self.cursor.change_y_pos(1, self.buffer)
+
+        elif key == curses.KEY_HOME:
+            self.cursor.cursor_start()
+
+        elif key == curses.KEY_END:
+            self.cursor.cursor_end(self.buffer)
+
+        elif key == curses.KEY_PPAGE:
+            self.cursor.cursor_scroll(True, self.buffer)
+
+        elif key == curses.KEY_NPAGE:
+            self.cursor.cursor_scroll(False, self.buffer)
+            
 
 
 editor = TextEditor()
