@@ -5,20 +5,20 @@ from buffer import TextBuffer
 
 @dataclass
 class CursorConfig:
-    scroll_keys_lines = 25
+    scroll_keys_lines = 30
 
 
-@dataclass
 class Cursor:
-    y_pos: int = 0
-    x_pos: int = 0
+    def __init__(self):
+        self.y_pos = 0
+        self.x_pos = 0
 
-    #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line and
-    #the line we are moving to isn't long enough for the cursor to have it's previous horizontal position.
-    #When not in use it's set to "-1" to allow for easy and always false comparisons using "max".
-    _desired_x_pos = -1
+        #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line
+        #and the line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to
+        #"-1" to allow for easy and always false comparisons using "max".
+        self._desired_x_pos = -1
 
-    config = CursorConfig()
+        self.config = CursorConfig()
 
 
     def get_y(self) -> int:
@@ -52,6 +52,8 @@ class Cursor:
 
             #Whenever the X position of the cursor is updated we also update the desired x position.
             self._desired_x_pos = self.x_pos
+
+            return True
         
         except:
             return False

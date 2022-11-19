@@ -17,10 +17,9 @@ class TextEditor(utils.CursesUtils):
         self.key = 0
         #The text buffer.
         self.buffer = TextBuffer()
-
-        self.buffer.get_line_count()
-
+        #The cursor
         self.cursor = Cursor()
+        #The display
         self.display = Display(self, self.buffer, self.cursor)
 
 
@@ -45,7 +44,6 @@ class TextEditor(utils.CursesUtils):
 
 
             self.stdscr.addstr(5, 0, "Y: {} X: {}".format(self.cursor.get_y(), self.cursor.get_x()), self.get_colour("WHITE_BLACK"))
-            self.stdscr.addstr(6, 0, "SUPR: {}".format(curses.KEY_DC), self.get_colour("WHITE_BLACK"))
 
 
             #Get console size.
