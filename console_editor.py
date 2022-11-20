@@ -5,6 +5,7 @@ from cursor import Cursor
 from display import Display
 from input_output import IOHandler
 
+
 class TextEditor(utils.CursesUtils):
     def __init__(self):
         super().__init__()
@@ -64,6 +65,8 @@ class TextEditor(utils.CursesUtils):
         if key >= 32 and key <= 253:
             self.buffer.add_char(chr(key), self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(True, self.buffer)
+            #Since we've modified the buffer we set the dirty flag.
+            self.io.set_dirty()
 
         #Backspace
         elif key == curses.ascii.BS:
@@ -76,9 +79,14 @@ class TextEditor(utils.CursesUtils):
             self.cursor.change_x_pos(False, self.buffer)
             self.buffer.delete_char(old_y, old_x)
 
+            #Since we've modified the buffer we set the dirty flag.
+            self.io.set_dirty()
+
         #Supr
         elif key == curses.KEY_DC:
             self.buffer.delete_char_forward(self.cursor.get_y(), self.cursor.get_x())
+            #Since we've modified the buffer we set the dirty flag.
+            self.io.set_dirty()
 
         #Enter, to detect it we use the ASCII "Carriage return(CR)" or "Line feed(LF)", both are included for compatibility reasons.
         elif key == curses.ascii.CR or key == curses.ascii.LF:
@@ -86,6 +94,8 @@ class TextEditor(utils.CursesUtils):
             #When the enter key is pressed we move the cursor down one line and then set it to the start of the line
             self.cursor.change_y_pos(1, self.buffer)
             self.cursor.cursor_start()
+            #Since we've modified the buffer we set the dirty flag.
+            self.io.set_dirty()
 
         #####Cursor movement keys#####
         elif key == curses.KEY_RIGHT:

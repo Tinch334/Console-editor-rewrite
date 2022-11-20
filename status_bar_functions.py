@@ -37,6 +37,6 @@ class StatusbarFunctions:
         return "{:02d}:{:02d}".format(current_time.hour, current_time.minute)
 
 
-    #Returns the position of the cursor, first vertical the horizontal.
+    #Returns the position of the cursor, first vertical the horizontal. We add 1 to both so they start counting from one.
     def statusbar_cursor(self) -> str:
-        return f"{self.cursor.get_y()},{self.cursor.get_x()}"
+        return f"{self.cursor.get_y() + 1},{self.cursor.get_x() + 1}"

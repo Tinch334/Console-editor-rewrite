@@ -2,7 +2,6 @@ import curses
 from typing import final, Union, Callable, Iterable, Any, Type
 
 
-
 #A class with functions to use with the curses library, the class that wishes to use the functions must inherit from this one.
 class CursesUtils():
     def __init__(self) -> None:

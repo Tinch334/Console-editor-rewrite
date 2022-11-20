@@ -115,11 +115,11 @@ class Display:
         for y in range(self.buffer_config.y_start, end_y):
             #In case we are at the very end of the buffer, and there's empty space before the status-bar.
             if y + self.buffer_y_scroll < self.buffer.get_line_count():
-                num_width = int(math.log10(y + 1)) + 1
-                padding = " " * (self.buffer_config.x_start - num_width - self.buffer_y_scroll)
                 #To calculate the current line number we add the buffer scroll to the y counter, that way it remains correct even when the
                 #buffer is scrolled vertically. Finally we add 1 to account for the fact that line numbers start at 1, not 0.
                 line_number = y + self.buffer_y_scroll + 1
+                num_width = int(math.log10(line_number)) + 1
+                padding = " " * (self.buffer_config.x_start - num_width)
 
                 self.editor.stdscr.addstr(y, 0, f"{padding}{line_number}", self.editor.get_colour(self.colour_config.line_number_colour))
             else:
@@ -144,52 +144,53 @@ class Display:
     def display_statusbar(self) -> None:
         statusbar_left = ""
         statusbar_right = ""
-        contents = ""
-        switch = False
+        separator = ""
         separator_index = 0
+        switch = False
 
         #This dictionary contains the name of the element in the configuration as keys and the function that gets that information as elements.
         element_definitions = {"filename" : self.status_bar_functions.statusbar_filename(), "lines" : self.status_bar_functions.statusbar_lines(), "modified" : self.status_bar_functions.statusbar_modified(), "time" : self.status_bar_functions.statusbar_time(), "cursor" : self.status_bar_functions.statusbar_cursor()}
 
         #We go through every element in the configuration.
         for elem in self.status_bar_elements:
-            #This check is done because after the last element there's no separator, however we still need to get to the end of this iteration
-            #to print it the element in question.
-            if separator_index < len(self.status_bar_separators):
-                #We evaluate the separator.
-                match self.status_bar_separators[separator_index]:
-                    case "-":
-                        contents = " - "
-
-                    case "\\":
-                        contents = " "
-
-                    case "/":
-                        switch = True
+            #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
+            if switch:
+                statusbar_right += element_definitions[elem]
             else:
-                contents = ""
+                statusbar_left += element_definitions[elem]
 
-            #This try block is here in case someone entered an invalid status-bar element.
-            try:
-                #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
-                if switch:
-                    statusbar_right += element_definitions[elem]
-                    statusbar_right += contents
-                else:
-                    statusbar_left += element_definitions[elem]
-                    statusbar_left += contents
-            except:
-                raise Exception(f"Invalid status-bar element \"{elem}\"!")
+            #This check is done because after the last element there's no separator, therefore we would be trying to access an invalid index.
+            if separator_index >= len(self.status_bar_separators):
+                break
+
+            #We evaluate the separator.
+            match self.status_bar_separators[separator_index]:
+                case "-":
+                        separator = " - "
+
+                case "\\":
+                        separator = " "
+
+                case "/":
+                    separator = ""
+                    switch = True
+
+            #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
+            if switch:
+                statusbar_right += separator
+            else:
+                statusbar_left += separator
 
             separator_index += 1
 
         #We add one space of right padding to the right side of the status-bar to make it look better.
         statusbar_right += " "
         #We put both sides of the status-bar together padding the space in the middle with spaces.
-        assembled_statusbar = statusbar_left + " " * (self.editor.x_size - len(statusbar_left) - len(statusbar_right)) + statusbar_right
+        separating_spaces = " " * (self.editor.x_size - len(statusbar_left) - len(statusbar_right))
+        assembled_statusbar = f"{statusbar_left}{separating_spaces}{statusbar_right}"
 
         #We print the status-bar.
-        self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end, 0, assembled_statusbar, self.editor.get_colour(self.colour_config.status_bar_colour))        
+        self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end, 0, assembled_statusbar, self.editor.get_colour(self.colour_config.status_bar_colour))
 
 
     def caclculate_x_start(self) -> None:

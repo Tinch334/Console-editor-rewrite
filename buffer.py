@@ -7,7 +7,6 @@ class Line:
     contents: str = ""
 
 
-
 class TextBuffer:
     def __init__(self):
         self.buffer = [Line()]
