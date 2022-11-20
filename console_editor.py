@@ -3,6 +3,7 @@ import utils, curses, curses.ascii
 from buffer import TextBuffer
 from cursor import Cursor
 from display import Display
+from input_output import IOHandler
 
 class TextEditor(utils.CursesUtils):
     def __init__(self):
@@ -15,19 +16,20 @@ class TextEditor(utils.CursesUtils):
         #####GENERAL VARIABLES#####
         #Last pressed key.
         self.key = 0
-        #The text buffer.
+        #The text buffer handler.
         self.buffer = TextBuffer()
-        #The cursor
+        #The cursor handler.
         self.cursor = Cursor()
-        #The display
-        self.display = Display(self, self.buffer, self.cursor)
+        #The I/O handler.
+        self.io = IOHandler()
+        #The display handler.
+        self.display = Display(self, self.buffer, self.cursor, self.io)
 
 
     def text_editor(self) -> None:
         while 1:
             #Clear the screen
             self.stdscr.clear()
-            
 
             #Get and process key input.
             self.get_input()
@@ -35,16 +37,11 @@ class TextEditor(utils.CursesUtils):
             #Call the display function.
             self.display.display()
 
-
             #####FOR TESTING#####
             if self.key == ord('q'):
                 #Properly exit curses and exit the program.
                 curses.endwin()
                 quit()
-
-
-            self.stdscr.addstr(5, 0, "Y: {} X: {}".format(self.cursor.get_y(), self.cursor.get_x()), self.get_colour("WHITE_BLACK"))
-
 
             #Get console size.
             self.get_size()
