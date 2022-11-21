@@ -174,7 +174,7 @@ class Display:
 
 
     #Handles the horizontal and vertical scroll for printing the appropriate part of the buffer depending on the position of the cursor. 
-    def scroll_handler(self) -> None:        
+    def scroll_handler(self) -> None:
         end_y = self.editor.y_size + self.buffer_config.y_end
         end_x = self.editor.x_size + self.buffer_config.x_end
         cursor_y = self.cursor.get_y()

@@ -1,6 +1,6 @@
 ---
 cursor behaviour:
-  scroll lines: 30 #The number of lines the editor scrolls when the "PgUP" and "PgDown" keys are pressed.
+  scroll lines: 30 #The number of lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.
 
 display behaviour:
   line number min width: 2 #The minimum width of the line number bar.
