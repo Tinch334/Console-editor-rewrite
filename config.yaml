@@ -1,0 +1,19 @@
+---
+cursor behaviour:
+  scroll lines: 30 #The number of lines the editor scrolls when the "PgUP" and "PgDown" keys are pressed.
+
+display behaviour:
+  line number min width: 2 #The minimum width of the line number bar.
+  statusbar config: "filename-lines\\modified/time-cursor" #The composition of the status-bar, see README for detailed explanation.
+  statusbar separators definitions: #All accepted status-bar separators, see README for detailed explanation
+    "-": " - "
+    "\\": " "
+    "/" : -1
+
+display colour:
+  text colour: "WHITE_BLACK" #Colour of the text normally.
+  cursor colour: "BLACK_WHITE" #Colour of the cursor and text under the cursor.
+  line number colour: "BLACK_WHITE" #Colour of the line number bar.
+  empty line number colour: "WHITE_BLACK" #Colour of a line without a number, they are the ones that have a "~" instead of a number.
+  status bar colour: "WHITE_BLUE" #The colour of the status-bar.
+  prompt colour: "WHITE_BLACK" #The colour of the prompt.

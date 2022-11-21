@@ -4,6 +4,7 @@ from buffer import TextBuffer
 from cursor import Cursor
 from display import Display
 from input_output import IOHandler
+from config import ConfigurationHandler
 
 
 class TextEditor(utils.CursesUtils):
@@ -17,14 +18,18 @@ class TextEditor(utils.CursesUtils):
         #####GENERAL VARIABLES#####
         #Last pressed key.
         self.key = 0
+
+        #####CLASSES#####
+        #The configuration handler.
+        self.config = ConfigurationHandler()
         #The text buffer handler.
         self.buffer = TextBuffer()
         #The cursor handler.
-        self.cursor = Cursor()
+        self.cursor = Cursor(self.config.get_cursor_config())
         #The I/O handler.
         self.io = IOHandler()
         #The display handler.
-        self.display = Display(self, self.buffer, self.cursor, self.io)
+        self.display = Display(self, self.buffer, self.cursor, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
 
 
     def text_editor(self) -> None:

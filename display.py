@@ -6,43 +6,20 @@ from buffer import TextBuffer
 from cursor import Cursor
 from input_output import IOHandler
 from status_bar_functions import StatusbarFunctions
-
-
-#This class contains configuration info pertaining to the buffer display. The Y and X ends are specified from the total height or width
-#respectively. For example, a "y_end" of (-2) means that the Y size of the buffer will be the total height of the console window minus 2.
-@dataclass
-class BufferDisplayConfig:
-    y_start: int = 0
-    y_end: int = -2
-    x_start: int = 0
-    x_end: int = 0
-
-    line_number_min_width = 2
-    status_bar_config= r"filename-lines\modified/time-cursor"
-
-
-#This class contains colour configuration for the various elements in the editor.
-@dataclass
-class BufferColourConfig:
-    text_colour = "WHITE_BLACK"
-    cursor_colour = "BLACK_WHITE"
-    line_number_colour = "BLACK_WHITE"
-    empty_line_number_colour = "WHITE_BLACK"
-    status_bar_colour = "WHITE_BLUE"
-    prompt_colour = "WHITE_BLACK"
+from config import DisplayConfig, DisplayColourConfig
 
 
 class Display:
     #Any is used in the "editor" variable type to avoid circular referencing.
-    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], io: type[IOHandler]) -> None:
+    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], io: type[IOHandler], buffer_config: type[DisplayConfig], colour_config: type[DisplayColourConfig]) -> None:
         self.editor = editor
         self.buffer = buffer
         self.cursor = cursor
         self.io = io
 
         #Configuration dataclasses for the display function.
-        self.buffer_config = BufferDisplayConfig()
-        self.colour_config = BufferColourConfig()
+        self.buffer_config = buffer_config
+        self.colour_config = colour_config
         #This class contains all the functions for the status-bar.
         self.status_bar_functions = StatusbarFunctions(self.buffer, self.cursor, self.io)
 
@@ -53,8 +30,8 @@ class Display:
 
         #The reason for these to be class variables instead of just function variables is so that they are only calculated once, not every call
         #to the "display" function.
-        self.status_bar_elements = None
-        self.status_bar_separators = None
+        self.statusbar_elements = None
+        self.statusbar_separators = None
 
         #We call this function only once, during the constructor since the data we get from it won't change during runtime.
         self.setup()
@@ -62,8 +39,8 @@ class Display:
 
     #Gets the value of variables that won't change during runtime.
     def setup(self) -> None:
-        self.status_bar_elements = re.split(r"[-\\\/]", self.buffer_config.status_bar_config)
-        self.status_bar_separators = re.findall(r"[-\\\/]", self.buffer_config.status_bar_config)
+        self.statusbar_elements = re.split(r"[-\\\/]", self.buffer_config.statusbar_config)
+        self.statusbar_separators = re.findall(r"[-\\\/]", self.buffer_config.statusbar_config)
 
 
     #This function calls all the different display functions, it's the one that should be called from the editor.
@@ -152,7 +129,7 @@ class Display:
         element_definitions = {"filename" : self.status_bar_functions.statusbar_filename(), "lines" : self.status_bar_functions.statusbar_lines(), "modified" : self.status_bar_functions.statusbar_modified(), "time" : self.status_bar_functions.statusbar_time(), "cursor" : self.status_bar_functions.statusbar_cursor()}
 
         #We go through every element in the configuration.
-        for elem in self.status_bar_elements:
+        for elem in self.statusbar_elements:
             #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
             if switch:
                 statusbar_right += element_definitions[elem]
@@ -160,20 +137,16 @@ class Display:
                 statusbar_left += element_definitions[elem]
 
             #This check is done because after the last element there's no separator, therefore we would be trying to access an invalid index.
-            if separator_index >= len(self.status_bar_separators):
+            if separator_index >= len(self.statusbar_separators):
                 break
 
-            #We evaluate the separator.
-            match self.status_bar_separators[separator_index]:
-                case "-":
-                        separator = " - "
+            #We get the corresponding value for the separator.
+            separator = self.buffer_config.statusbar_separators_definitions[self.statusbar_separators[separator_index]]
 
-                case "\\":
-                        separator = " "
-
-                case "/":
-                    separator = ""
-                    switch = True
+            #If the value is "(-1)" that means to switch from left to right.
+            if separator == (-1):
+                separator = ""
+                switch = True
 
             #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
             if switch:

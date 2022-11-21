@@ -1,15 +1,11 @@
 from dataclasses import dataclass
 
 from buffer import TextBuffer
-
-
-@dataclass
-class CursorConfig:
-    scroll_keys_lines = 30
+from config import CursorConfig
 
 
 class Cursor:
-    def __init__(self):
+    def __init__(self, config: type[CursorConfig]):
         self.y_pos = 0
         self.x_pos = 0
 
@@ -18,7 +14,7 @@ class Cursor:
         #"-1" to allow for easy and always false comparisons using "max".
         self._desired_x_pos = -1
 
-        self.config = CursorConfig()
+        self.config = config
 
 
     def get_y(self) -> int:
