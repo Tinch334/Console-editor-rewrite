@@ -2,7 +2,7 @@ import os.path
 from dataclasses import dataclass
 from typing import Optional
 
-from buffer import TextBuffer
+from buffer.buffer import TextBuffer
 
 
 @dataclass

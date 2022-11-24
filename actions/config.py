@@ -37,7 +37,7 @@ class DisplayColourConfig:
 
 class ConfigurationHandler:
     def __init__(self):
-        self.config_file_name = "config.yaml"
+        self.config_file_name = "./actions/config.yaml"
         self.config_file = None
 
         self.load_config_file()

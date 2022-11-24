@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from buffer import TextBuffer
-from config import CursorConfig
+from buffer.buffer import TextBuffer
+from actions.config import CursorConfig
 
 
 class Cursor:

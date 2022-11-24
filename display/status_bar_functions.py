@@ -1,8 +1,8 @@
 import datetime
 
-from buffer import TextBuffer
-from cursor import Cursor
-from input_output import IOHandler
+from buffer.buffer import TextBuffer
+from buffer.cursor import Cursor
+from actions.input_output import IOHandler
 
 
 #The status-bar functions are in another class to avoid cluttering the "Display" class with too many functions.

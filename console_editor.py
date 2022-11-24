@@ -1,13 +1,14 @@
-import utils, curses, curses.ascii
+import curses, curses.ascii
 
-from buffer import TextBuffer
-from cursor import Cursor
-from display import Display
-from input_output import IOHandler
-from config import ConfigurationHandler
+from actions.utils import CursesUtils
+from buffer.buffer import TextBuffer
+from buffer.cursor import Cursor
+from display.display import Display
+from actions.input_output import IOHandler
+from actions.config import ConfigurationHandler
 
 
-class TextEditor(utils.CursesUtils):
+class TextEditor(CursesUtils):
     def __init__(self):
         super().__init__()
 
@@ -42,12 +43,6 @@ class TextEditor(utils.CursesUtils):
 
             #Call the display function.
             self.display.display()
-
-            #####FOR TESTING#####
-            if self.key == ord('q'):
-                #Properly exit curses and exit the program.
-                curses.endwin()
-                quit()
 
             #Get console size.
             self.get_size()
@@ -126,7 +121,17 @@ class TextEditor(utils.CursesUtils):
 
         elif key == curses.KEY_NPAGE:
             self.cursor.cursor_scroll(False, self.buffer)
-            
+
+        #####"CTRL" keys#####
+        #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value
+        #returned when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
+        elif key == ord("S") - 64:
+            raise Exception("Ctrl+S")
+
+        elif key == ord("Q") - 64:
+            #Properly terminate curses and exit the program.
+            curses.endwin()            
+            quit()
 
 
 editor = TextEditor()

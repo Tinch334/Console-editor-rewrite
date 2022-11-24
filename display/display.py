@@ -2,11 +2,11 @@ import math, re
 from dataclasses import dataclass
 from typing import Any
 
-from buffer import TextBuffer
-from cursor import Cursor
-from input_output import IOHandler
-from status_bar_functions import StatusbarFunctions
-from config import DisplayConfig, DisplayColourConfig
+from buffer.buffer import TextBuffer
+from buffer.cursor import Cursor
+from actions.input_output import IOHandler
+from display.status_bar_functions import StatusbarFunctions
+from actions.config import DisplayConfig, DisplayColourConfig
 
 
 class Display:
