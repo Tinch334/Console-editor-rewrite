@@ -1,20 +1,21 @@
 import math, re
-from dataclasses import dataclass
 from typing import Any
 
 from buffer.buffer import TextBuffer
 from buffer.cursor import Cursor
-from actions.input_output import IOHandler
 from display.status_bar_functions import StatusbarFunctions
+from actions.prompt import Prompt
+from actions.input_output import IOHandler
 from actions.config import DisplayConfig, DisplayColourConfig
 
 
 class Display:
     #Any is used in the "editor" variable type to avoid circular referencing.
-    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], io: type[IOHandler], buffer_config: type[DisplayConfig], colour_config: type[DisplayColourConfig]) -> None:
+    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], prompt: type[Prompt], io: type[IOHandler], buffer_config: type[DisplayConfig], colour_config: type[DisplayColourConfig]) -> None:
         self.editor = editor
         self.buffer = buffer
         self.cursor = cursor
+        self.prompt = prompt
         self.io = io
 
         #Configuration dataclasses for the display function.
@@ -47,7 +48,7 @@ class Display:
     def display(self) -> None:
         #We calculate the x start of the buffer, for now equal to the line number width, that value is then used to print the buffer and
         #cursor. We can call this function before calculating the scroll because the scroll calculation uses the x start.
-        self.caclculate_x_start()
+        self.calculate_x_start()
         #Before printing anything we update the scroll variables.
         self.scroll_handler()
 
@@ -55,6 +56,7 @@ class Display:
         self.display_cursor()
         self.display_line_nums()
         self.display_statusbar()
+        self.display_prompt()
 
 
     #Displays the buffer.
@@ -166,7 +168,13 @@ class Display:
         self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end, 0, assembled_statusbar, self.editor.get_colour(self.colour_config.status_bar_colour))
 
 
-    def caclculate_x_start(self) -> None:
+    #Displays the prompt.
+    def display_prompt(self) -> None:
+        self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end + 1, 0, self.prompt.get_prompt(), self.editor.get_colour(self.colour_config.prompt_colour))
+
+
+    #Calculates the start position for printing the buffer.
+    def calculate_x_start(self) -> None:
         #The number of characters required to display the maximum number of lines.
         line_number_width = max(int(math.log10(self.buffer.get_line_count())) + 1, self.buffer_config.line_number_min_width)
         #We set the x_start according to the width of the line number.

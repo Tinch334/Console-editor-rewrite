@@ -6,6 +6,7 @@ from buffer.cursor import Cursor
 from display.display import Display
 from actions.input_output import IOHandler
 from actions.config import ConfigurationHandler
+from actions.prompt import Prompt
 
 
 class TextEditor(CursesUtils):
@@ -29,8 +30,10 @@ class TextEditor(CursesUtils):
         self.cursor = Cursor(self.config.get_cursor_config())
         #The I/O handler.
         self.io = IOHandler()
+        #The prompt handler.
+        self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+Q - quit", 3.5)
         #The display handler.
-        self.display = Display(self, self.buffer, self.cursor, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
+        self.display = Display(self, self.buffer, self.cursor, self.prompt, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
 
 
     def text_editor(self) -> None:

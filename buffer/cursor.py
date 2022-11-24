@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from buffer.buffer import TextBuffer
 from actions.config import CursorConfig
 
