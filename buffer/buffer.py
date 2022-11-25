@@ -104,7 +104,6 @@ class TextBuffer:
         except:
             return None
 
-
     #Returns how many lines the buffer has, it's length.
     def get_line_count(self) -> int:
         return len(self.buffer)

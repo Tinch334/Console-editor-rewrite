@@ -26,24 +26,20 @@ class IOHandler:
         return self.filename
 
 
-    #Takes a buffer and saves it to the specified "filename", returns "0" if no errors occurred. If no filename was specified and no filename
-    #was provided it returns "-1", if an access/permission error occurred it returns "-2".
-    def save_file(self, buffer: type[TextBuffer], filename: Optional[str] = None, line_ending: str = "\n") -> int:
-        #If there's no supplied filename and it's not set in the class then we don't have any way of getting the filename, return an error.
-        if filename == None and self.filename == None:
-            return -1
-        elif filename != None:
-            self.filename = filename
-
+    #Takes a buffer and saves it to the specified "filename", returns the number of bytes written if no errors occurred. If an access/permission
+    #error occurred it returns "-1".
+    def save_file(self, buffer: type[TextBuffer], filename: str, line_ending: str = "\n") -> int:
         #This try block is to avoid creating a security hole that might allow a user to access files without permission.
         try:
-            path = os.path.join(os.getcwd(), self.filename)
-            file = open(self.filename, "w")
+            path = os.path.join(os.getcwd(), filename)
+            file = open(filename, "w")
 
         #In case the user doesn't have permission or some other error occurred.
         except:
-            return -2
-        else:
+            return -1
+        else:   
+            #If the file could be opened/created set the filename.
+            self.filename = filename
 
             #We read each line in the buffer and write it to the file, adding the corresponding line ending.
             for y in range(0, buffer.get_line_count()):
@@ -54,5 +50,5 @@ class IOHandler:
             #file, it's no longer dirty.
             self.dirty = False
 
-            #No errors occurred, return 0.
-            return 0
+            #No errors occurred, return the number of bytes written to disk.
+            return os.path.getsize(path)

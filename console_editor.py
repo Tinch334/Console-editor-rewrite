@@ -1,4 +1,4 @@
-import curses, curses.ascii
+import curses, curses.ascii, os.path
 
 from actions.utils import CursesUtils
 from buffer.buffer import TextBuffer
@@ -7,6 +7,7 @@ from display.display import Display
 from actions.input_output import IOHandler
 from actions.config import ConfigurationHandler
 from actions.prompt import Prompt
+from actions.basic_input import BasicInput
 
 
 class TextEditor(CursesUtils):
@@ -34,10 +35,13 @@ class TextEditor(CursesUtils):
         self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+Q - quit", 3.5)
         #The display handler.
         self.display = Display(self, self.buffer, self.cursor, self.prompt, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
+        #Basic input handler.
+        self.basic_input = BasicInput(self, self.config.get_display_colour_config())
+
 
 
     def text_editor(self) -> None:
-        while 1:
+        while True:
             #Clear the screen
             self.stdscr.clear()
 
@@ -46,6 +50,9 @@ class TextEditor(CursesUtils):
 
             #Call the display function.
             self.display.display()
+
+            #Call the prompt handler.
+            self.prompt.prompt_handler()
 
             #Get console size.
             self.get_size()
@@ -129,12 +136,36 @@ class TextEditor(CursesUtils):
         #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value
         #returned when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
         elif key == ord("S") - 64:
-            raise Exception("Ctrl+S")
+            self.save_handler()
 
         elif key == ord("Q") - 64:
             #Properly terminate curses and exit the program.
             curses.endwin()            
             quit()
+
+
+    #Handles calling the I/O saving function and it's errors.
+    def save_handler(self):
+        filename = self.io.get_filename()
+
+        #In case there's no specified filename we get one.
+        if filename == None:
+            #Disable the prompt, get input and then re-enable the prompt.
+            self.prompt.toggle_enabled()
+            filename = self.basic_input.basic_input(self.y_size - 1, 0, "Save file: ")
+            self.prompt.toggle_enabled()
+
+            #The escape key was pressed, therefore no filename was entered.
+            if filename == None:
+                return
+
+        result = self.io.save_file(self.buffer, filename)
+
+        #No errors occurred, display size of file saved in the prompt.
+        if result > 0:
+            self.prompt.change_prompt(f"{os.path.getsize(filename)} bytes written to disk")
+        else:
+            self.prompt.change_prompt(f"Failed to save file, make sure the location exists and you have permission")
 
 
 editor = TextEditor()

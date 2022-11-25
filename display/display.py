@@ -170,7 +170,8 @@ class Display:
 
     #Displays the prompt.
     def display_prompt(self) -> None:
-        self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end + 1, 0, self.prompt.get_prompt(), self.editor.get_colour(self.colour_config.prompt_colour))
+        if self.prompt.get_enabled():
+            self.editor.stdscr.addstr(self.editor.y_size - 1, 0, self.prompt.get_prompt(), self.editor.get_colour(self.colour_config.prompt_colour))
 
 
     #Calculates the start position for printing the buffer.
