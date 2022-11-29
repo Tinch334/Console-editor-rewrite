@@ -138,6 +138,9 @@ class TextEditor(CursesUtils):
         elif key == ord("S") - 64:
             self.save_handler()
 
+        elif key == ord("O") - 64:
+            self.load_handler()
+
         elif key == ord("Q") - 64:
             #Properly terminate curses and exit the program.
             curses.endwin()            
@@ -166,6 +169,25 @@ class TextEditor(CursesUtils):
             self.prompt.change_prompt(f"{os.path.getsize(filename)} bytes written to disk")
         else:
             self.prompt.change_prompt(f"Failed to save file, make sure the location exists and you have permission")
+
+
+    def load_handler(self):
+        #Disable the prompt, get input and then re-enable the prompt.
+        self.prompt.toggle_enabled()
+        filename = self.basic_input.basic_input(self.y_size - 1, 0, "Open file: ")
+        self.prompt.toggle_enabled()
+
+        #The escape key was pressed, therefore no filename was entered.
+        if filename == None:
+            return
+
+        result = self.io.load_file(self.buffer, filename)
+
+        #No errors occurred, display size of file opened in the prompt.
+        if result > 0:
+            self.prompt.change_prompt(f"Loaded {os.path.getsize(filename)} bytes from {filename}")
+        else:
+            self.prompt.change_prompt(f"Failed to open file, make sure the file exists and you have permission")
 
 
 editor = TextEditor()

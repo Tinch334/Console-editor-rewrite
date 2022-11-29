@@ -1,4 +1,3 @@
-
 # Console-editor-rewrite
 A rewrite of my console editor written in Python using the curses library. The original version can be found [here](https://github.com/Tinch334/Console-editor).
 

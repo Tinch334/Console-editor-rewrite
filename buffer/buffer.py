@@ -107,3 +107,8 @@ class TextBuffer:
     #Returns how many lines the buffer has, it's length.
     def get_line_count(self) -> int:
         return len(self.buffer)
+
+
+    #Receives a list of lines and sets that as the buffer, it's used for opening files.
+    def set_buffer(self, buffer: list[Line]) -> None:
+        self.buffer = buffer
