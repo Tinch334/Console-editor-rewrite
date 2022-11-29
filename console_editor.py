@@ -39,7 +39,7 @@ class TextEditor(CursesUtils):
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
         #Command help handler
-        self.command_help = CommandHelp(["Lorem ipsum dolor sit amet", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.config.get_editor_forget_time())
+        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.config.get_editor_forget_time())
 
 
     def text_editor(self) -> None:
@@ -106,6 +106,7 @@ class TextEditor(CursesUtils):
             self.buffer.newline(self.cursor.get_y(), self.cursor.get_x())
             #When the enter key is pressed we move the cursor down one line and then set it to the start of the line
             self.cursor.change_y_pos(1, self.buffer)
+            #Set the cursor to the beginning of the new line.
             self.cursor.cursor_start()
             #Since we've modified the buffer we set the dirty flag.
             self.io.set_dirty()
@@ -138,19 +139,27 @@ class TextEditor(CursesUtils):
         #####"CTRL" keys#####
         #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value
         #returned when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
-        #Ctrl+S
+        #Ctrl+S -- Save
         elif key == ord("S") - 64:
             self.save_handler()
 
-        #Ctrl+O
+        #Ctrl+O -- Open
         elif key == ord("O") - 64:
             self.load_handler()
 
-        #Ctrl+A
+        #Ctrl+A -- Command help
         elif key == ord("A") - 64:
             self.prompt.change_prompt(self.command_help.get_help_line())
 
-        #Ctrl+Q
+        #Ctrl+G -- Goto line.
+        elif key == ord("G") - 64:
+            self.goto_line()
+
+        #Ctrl+W -- Word count
+        elif key == ord("W") - 64:
+            self.word_count()
+
+        #Ctrl+Q -- Quit
         elif key == ord("Q") - 64:
             #Properly terminate curses and exit the program.
             curses.endwin()            
@@ -158,7 +167,7 @@ class TextEditor(CursesUtils):
 
 
     #Handles calling the I/O saving function and it's errors.
-    def save_handler(self):
+    def save_handler(self) -> None:
         filename = self.io.get_filename()
 
         #In case there's no specified filename we get one.
@@ -182,7 +191,7 @@ class TextEditor(CursesUtils):
 
 
     #Handles calling the I/O loading function and it's errors.
-    def load_handler(self):
+    def load_handler(self) -> None:
         #Disable the prompt, get input and then re-enable the prompt.
         self.prompt.toggle_enabled()
         filename = self.basic_input.basic_input(self.y_size - 1, 0, "Open file: ")
@@ -199,6 +208,46 @@ class TextEditor(CursesUtils):
             self.prompt.change_prompt(f"Loaded {os.path.getsize(filename)} bytes from {filename}")
         else:
             self.prompt.change_prompt(f"Failed to open file, make sure the file exists and you have permission")
+
+
+    #Gets a line number using basic input and then goes to it.
+    def goto_line(self) -> None:
+        #Disable the prompt, get input and then re-enable the prompt.
+        self.prompt.toggle_enabled()
+        line = self.basic_input.basic_input(self.y_size - 1, 0, "Line number: ")
+        self.prompt.toggle_enabled()
+
+        #The escape key was pressed, therefore no line was entered.
+        if line == None:
+            return
+
+        #We make sure the user entered a number.
+        try:
+            line = int(line)
+
+        except:
+            #If an invalid value was entered show an error in the prompt and exit.
+            self.prompt.change_prompt("Invalid line entered")
+        else:
+            #Check if the jump was successful, i.e. if the line exists.
+            if self.cursor.change_y_pos((line - self.cursor.get_y() - 1), self.buffer):
+                #Set the cursor to the beginning of the new line.
+                self.cursor.cursor_start()
+            else:
+                self.prompt.change_prompt("Invalid line entered")
+
+
+    #Counts the number of words in the file and displays it in the console.
+    def word_count(self) -> None:
+        words = 0
+
+        #Counts all strings composed of alphanumeric characters separated by spaces in the buffer.
+        for y in range(0, self.buffer.get_line_count()):
+            for word in self.buffer.get_line(y).split():
+                if (word.isalpha()):
+                    words += 1
+
+        self.prompt.change_prompt(f"There are {words} words in the current file")
 
 
 editor = TextEditor()
