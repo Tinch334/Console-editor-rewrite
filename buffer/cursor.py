@@ -1,5 +1,5 @@
 from buffer.buffer import TextBuffer
-from actions.config import CursorConfig
+from configuration.config import CursorConfig
 
 
 class Cursor:

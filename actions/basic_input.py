@@ -1,7 +1,7 @@
 import curses
 from typing import Any, Optional
 
-from actions.config import DisplayColourConfig
+from configuration.config import DisplayColourConfig
 
 
 #Allows for basic singe line input. Returns the entered string or "None" if the escape key was pressed.

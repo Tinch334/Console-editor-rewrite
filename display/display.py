@@ -6,7 +6,7 @@ from buffer.cursor import Cursor
 from display.status_bar_functions import StatusbarFunctions
 from actions.prompt import Prompt
 from actions.input_output import IOHandler
-from actions.config import DisplayConfig, DisplayColourConfig
+from configuration.config import DisplayConfig, DisplayColourConfig
 
 
 class Display:

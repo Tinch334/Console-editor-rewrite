@@ -37,7 +37,7 @@ class DisplayColourConfig:
 
 class ConfigurationHandler:
     def __init__(self):
-        self.config_file_name = "./actions/config.yaml"
+        self.config_file_name = "./configuration/config.yaml"
         self.config_file = None
 
         self.load_config_file()
@@ -49,6 +49,11 @@ class ConfigurationHandler:
         with open(self.config_file_name) as file:
             #We use the "SafeLoader" to avoid leaving a security hole that could be exploited.
             self.config_file = yaml.load(file, Loader = SafeLoader)
+
+
+    #Returns an the editor forget time, in seconds.
+    def get_editor_forget_time(self) -> int:
+        return self.config_file["editor behaviour"]["editor forget time"]
 
 
     #Returns a "CursorConfig" dataclass configured with the values from the configuration file.

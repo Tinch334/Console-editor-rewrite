@@ -5,8 +5,9 @@ from buffer.buffer import TextBuffer
 from buffer.cursor import Cursor
 from display.display import Display
 from actions.input_output import IOHandler
-from actions.config import ConfigurationHandler
+from configuration.config import ConfigurationHandler
 from actions.prompt import Prompt
+from actions.command_help import CommandHelp
 from actions.basic_input import BasicInput
 
 
@@ -32,12 +33,13 @@ class TextEditor(CursesUtils):
         #The I/O handler.
         self.io = IOHandler()
         #The prompt handler.
-        self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+Q - quit", 3.5)
+        self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+A - command help | Ctrl+Q - quit", self.config.get_editor_forget_time())
         #The display handler.
         self.display = Display(self, self.buffer, self.cursor, self.prompt, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
-
+        #Command help handler
+        self.command_help = CommandHelp(["Lorem ipsum dolor sit amet", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.config.get_editor_forget_time())
 
 
     def text_editor(self) -> None:
@@ -51,8 +53,9 @@ class TextEditor(CursesUtils):
             #Call the display function.
             self.display.display()
 
-            #Call the prompt handler.
+            #Call all handlers.
             self.prompt.prompt_handler()
+            self.command_help.help_line_handler()
 
             #Get console size.
             self.get_size()
@@ -135,12 +138,19 @@ class TextEditor(CursesUtils):
         #####"CTRL" keys#####
         #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value
         #returned when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
+        #Ctrl+S
         elif key == ord("S") - 64:
             self.save_handler()
 
+        #Ctrl+O
         elif key == ord("O") - 64:
             self.load_handler()
 
+        #Ctrl+A
+        elif key == ord("A") - 64:
+            self.prompt.change_prompt(self.command_help.get_help_line())
+
+        #Ctrl+Q
         elif key == ord("Q") - 64:
             #Properly terminate curses and exit the program.
             curses.endwin()            
@@ -171,6 +181,7 @@ class TextEditor(CursesUtils):
             self.prompt.change_prompt(f"Failed to save file, make sure the location exists and you have permission")
 
 
+    #Handles calling the I/O loading function and it's errors.
     def load_handler(self):
         #Disable the prompt, get input and then re-enable the prompt.
         self.prompt.toggle_enabled()
