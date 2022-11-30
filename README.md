@@ -11,7 +11,7 @@ The console editor requires the following:
 To run the editor first ensure that all the editor folders are in the same folder as `console_editor.py`. Then do `python console_editor.py"` to run the editor.
 
 ## Shortcuts
-To access editor functions keyboard shortcuts are used, for now they can't be configured. To view 
+To access editor functions keyboard shortcuts are used, for now they can't be configured. They are:
 * `Ctrl+S`: Save file, if a filename is specified the file will be saved to it, otherwise the editor will prompt the user for one. The editor **will** overwrite existing files if you choose to save with the name of an already existing file.
 * `Ctrl+O`: Open file, the editor will prompt the user for the file to open. The editor will discard all unsaved changes when opening a file.
 * `Ctrl+Q`: Quit, exits the editor. The editor will discard all unsaved changes when exiting a file.
