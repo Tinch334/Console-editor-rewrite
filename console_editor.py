@@ -26,6 +26,8 @@ class TextEditor(CursesUtils):
         #####CLASSES#####
         #The configuration handler.
         self.config = ConfigurationHandler()
+        #The editor's configuration.
+        self.editor_config = self.config.get_editor_config()
         #The text buffer handler.
         self.buffer = TextBuffer()
         #The cursor handler.
@@ -33,13 +35,13 @@ class TextEditor(CursesUtils):
         #The I/O handler.
         self.io = IOHandler()
         #The prompt handler.
-        self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+A - command help | Ctrl+Q - quit", self.config.get_editor_forget_time())
+        self.prompt = Prompt("COMMANDS: Ctrl+S - save | Ctrl+O - open | Ctrl+A - command help | Ctrl+Q - quit", self.editor_config.forget_time)
         #The display handler.
         self.display = Display(self, self.buffer, self.cursor, self.prompt, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
         #Command help handler
-        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.config.get_editor_forget_time())
+        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
 
 
     def text_editor(self) -> None:
@@ -110,6 +112,20 @@ class TextEditor(CursesUtils):
             self.cursor.cursor_start()
             #Since we've modified the buffer we set the dirty flag.
             self.io.set_dirty()
+
+
+        #Tab key.
+        elif key == curses.ascii.TAB:
+            tab_size = self.editor_config.tab_size
+            cursor_x = self.cursor.get_x()
+
+            tabs_to_insert = (tab_size - (cursor_x % tab_size))
+
+            #Since there's no function in the buffer to insert a string we just add the space characters one by one, whilst moving the cursor
+            #at the same time.
+            for x in range(tabs_to_insert):
+                self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x() + x)
+                self.cursor.change_x_pos(True, self.buffer)
 
         #####Cursor movement keys#####
         elif key == curses.KEY_RIGHT:

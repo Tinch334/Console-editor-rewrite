@@ -3,6 +3,12 @@ from yaml.loader import SafeLoader
 from dataclasses import dataclass
 
 
+@dataclass
+class EditorConfig:
+    forget_time: int = None
+    tab_size: int = None
+
+
 #Configuration for the cursor.
 @dataclass
 class CursorConfig:
@@ -51,9 +57,13 @@ class ConfigurationHandler:
             self.config_file = yaml.load(file, Loader = SafeLoader)
 
 
-    #Returns an the editor forget time, in seconds.
-    def get_editor_forget_time(self) -> int:
-        return self.config_file["editor behaviour"]["editor forget time"]
+    #Returns a "EditorConfig" dataclass with the values from the configuration file.
+    def get_editor_config(self) -> EditorConfig:
+        config = EditorConfig()
+        config.forget_time = config.editor_forget_time = self.config_file["editor behaviour"]["editor forget time"]
+        config.tab_size = self.config_file["editor behaviour"]["tab size"]
+
+        return config
 
 
     #Returns a "CursorConfig" dataclass configured with the values from the configuration file.
@@ -64,7 +74,7 @@ class ConfigurationHandler:
         return config
 
 
-    #Returns a "DisplayConfig" dataclass configured with the values from the configuration file.
+    #Returns a "DisplayConfig" dataclass with the values from the configuration file.
     def get_display_config(self) -> DisplayConfig:
         config = DisplayConfig()
         config.line_number_min_width = self.config_file["display behaviour"]["line number min width"]
@@ -74,7 +84,7 @@ class ConfigurationHandler:
         return config
 
 
-    #Returns a "DisplayColourConfig" dataclass configured with the values from the configuration file.
+    #Returns a "DisplayColourConfig" dataclass with the values from the configuration file.
     def get_display_colour_config(self) -> DisplayColourConfig:
         config = DisplayColourConfig()
         config.text_colour = self.config_file["display colour"]["text colour"]

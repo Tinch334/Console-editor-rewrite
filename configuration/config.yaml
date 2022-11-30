@@ -1,6 +1,7 @@
 ---
 editor behaviour:
   editor forget time: 4 #The time it takes the editor to "forget" something, an input, a prompt, etc.
+  tab size: 4 #The size of standard tabulation.
 
 cursor behaviour:
   scroll lines: 30 #The number of lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.

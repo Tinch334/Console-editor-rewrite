@@ -86,6 +86,7 @@ class TextBuffer:
         except:
             return False
 
+    #####Getters and setters#####
 
     #Returns the character in the specified position if possible, otherwise returns "None".
     def get_char(self, y_pos: int, x_pos: int) -> Optional[str]:
