@@ -1,3 +1,4 @@
+
 # Console-editor-rewrite
 A rewrite of my console editor written in Python using the curses library. The original version can be found [here](https://github.com/Tinch334/Console-editor).
 
@@ -7,7 +8,15 @@ The console editor requires the following:
 - The curses module, if you are using Linux you already have it, if instead you use Windows see [windows-curses](https://pypi.org/project/windows-curses/).
 
 ## Running
-To run the editor first ensure that all the files are in the same folder for the editor to work, including the configuration file. Then do `python console_editor.py"` to run the editor.
+To run the editor first ensure that all the editor folders are in the same folder as `console_editor.py`. Then do `python console_editor.py"` to run the editor.
+
+## Shortcuts
+To access editor functions keyboard shortcuts are used, for now they can't be configured. They are:
+* `Ctrl+S`: Save file, if a filename is specified the file will be saved to it, otherwise the editor will prompt the user for one. The editor **will** overwrite existing files if you choose to save with the name of an already existing file.
+* `Ctrl+O`: Open file, the editor will prompt the user for the file to open. The editor will discard all unsaved changes when opening a file.
+* `Ctrl+Q`: Quit, exits the editor. The editor will discard all unsaved changes when exiting a file.
+* `Ctrl+G`: Goto line, moves the cursor to the specified line, if it exists.
+* `Ctrl+W`: Counts the number of words, alphanumeric characters, in the file.
 
 ## Configuration file
 The editor has a configuration file, in YAML. Note that giving fields improper values may break the editor or cause it to not work.
@@ -23,22 +32,23 @@ The status bar is in the next-to-last line of the editor, it contains useful inf
 
 #### Elements
 Currently there are five available elements:
-* `filename:` The name of the file being edited, if it has no name it displays `[No filename]`.
-* `lines:` The amount of lines the current file has.
-* `modified:` Whether the file has been modified and has unsaved changes.
-* `cursor:` Shows the position of the cursor, first vertical then horizontal.
-* `time:` Shows the current time in twenty-four hour format.
+* `filename`: The name of the file being edited, if it has no name it displays `[No filename]`.
+* `lines`: The amount of lines the current file has.
+* `modified`: Whether the file has been modified and has unsaved changes.
+* `cursor`: Shows the position of the cursor, first vertical then horizontal.
+* `time`: Shows the current time in twenty-four hour format.
 
 #### Separators
 Separators can be configured and expanded, you can add your own. All the separators the editor recognizes are under `statusbar separators definitions`, they follow the format  `"<identifier>: "<string>"`. Where the identifier is what the editor will look for in `statusbar config`  and string what it will be replaced with in the status-bar. 
 
 The available separators:
-* ``\:`` An empty separator, a space will be inserted between the elements.
-* ``-:`` The string ``" - "`` will be inserted between the elements.
-* ``/:`` The rest of the elements after this separator will be right aligned.
+* ``\``: An empty separator, a space will be inserted between the elements.
+* ``-``: The string ``" - "`` will be inserted between the elements.
+* ``/``: The rest of the elements after this separator will be right aligned.
 
 **Note about '/' :** If you look at the value for `/` in the configuration file you will note that it's `-1`, this is what makes it the right align separator. You can change it to be whatever you like, however it's a bad idea to have more than one right align separator.
 
-### Misc configurations
-Currently there is one "miscellaneous" option in the editor:
-* ``scroll lines:`` It controls how many lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.
+### Other configurations
+Currently there are two fields in the configuration file not related to colour:
+* `editor forget time`: It controls the time it takes the editor to "forget" something or return to it's normal state. For example this determines how long a non default prompt will stay.
+* `scroll lines`: It controls how many lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.
