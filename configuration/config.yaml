@@ -8,10 +8,10 @@ cursor behaviour:
 
 display behaviour:
   line number min width: 2 #The minimum width of the line number bar.
-  statusbar config: "filename-lines\\modified/time-cursor" #The composition of the status-bar, see README for detailed explanation.
+  statusbar config: "filename-lines|modified/time-cursor" #The composition of the status-bar, see README for detailed explanation.
   statusbar separators definitions: #All accepted status-bar separators, see README for detailed explanation
     "-": " - "
-    "\\": " "
+    "|": " "
     "/" : -1
 
 display colour:

@@ -11,7 +11,7 @@ from configuration.config import DisplayConfig, DisplayColourConfig
 
 class Display:
     #Any is used in the "editor" variable type to avoid circular referencing.
-    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], prompt: type[Prompt], io: type[IOHandler], buffer_config: type[DisplayConfig], colour_config: type[DisplayColourConfig]) -> None:
+    def __init__(self, editor: Any, buffer: type[TextBuffer], cursor: type[Cursor], prompt: type[Prompt], io: type[IOHandler], display_config: type[DisplayConfig], colour_config: type[DisplayColourConfig]) -> None:
         self.editor = editor
         self.buffer = buffer
         self.cursor = cursor
@@ -19,7 +19,7 @@ class Display:
         self.io = io
 
         #Configuration dataclasses for the display function.
-        self.buffer_config = buffer_config
+        self.display_config = display_config
         self.colour_config = colour_config
         #This class contains all the functions for the status-bar.
         self.status_bar_functions = StatusbarFunctions(self.buffer, self.cursor, self.io)
@@ -40,8 +40,8 @@ class Display:
 
     #Gets the value of variables that won't change during runtime.
     def setup(self) -> None:
-        self.statusbar_elements = re.split(r"[-\\\/]", self.buffer_config.statusbar_config)
-        self.statusbar_separators = re.findall(r"[-\\\/]", self.buffer_config.statusbar_config)
+        self.statusbar_elements = re.split(f"[{self.display_config.statusbar_separators_definitions}]", self.display_config.statusbar_config)
+        self.statusbar_separators = re.findall(f"[{self.display_config.statusbar_separators_definitions}]", self.display_config.statusbar_config)
 
 
     #This function calls all the different display functions, it's the one that should be called from the editor.
@@ -61,16 +61,16 @@ class Display:
 
     #Displays the buffer.
     def display_buffer(self) -> None:
-        display_y = self.buffer_config.y_start
+        display_y = self.display_config.y_start
 
-        end_y = self.editor.y_size + self.buffer_config.y_end
-        end_x = self.editor.x_size + self.buffer_config.x_end
+        end_y = self.editor.y_size + self.display_config.y_end
+        end_x = self.editor.x_size + self.display_config.x_end
 
         #We iterate through every line between the scroll and the end of the buffer, we do the same in each line with the characters. Every
         #iteration we check if the printing indexes we are using have exceeded the ones specified in the buffer configuration to avoid printing
         #out of bounds.
         for y in range(self.buffer_y_scroll, self.buffer.get_line_count()):
-            display_x = self.buffer_config.x_start
+            display_x = self.display_config.x_start
             current_line = self.buffer.get_line(y)
 
             for x in range(self.buffer_x_scroll, len(current_line)):
@@ -87,18 +87,18 @@ class Display:
                 break
 
 
-    #Displays line numbers an calculates "buffer_config.x_start".
+    #Displays line numbers.
     def display_line_nums(self) -> None:
-        end_y = self.editor.y_size + self.buffer_config.y_end
+        end_y = self.editor.y_size + self.display_config.y_end
 
-        for y in range(self.buffer_config.y_start, end_y):
+        for y in range(self.display_config.y_start, end_y):
             #In case we are at the very end of the buffer, and there's empty space before the status-bar.
             if y + self.buffer_y_scroll < self.buffer.get_line_count():
                 #To calculate the current line number we add the buffer scroll to the y counter, that way it remains correct even when the
                 #buffer is scrolled vertically. Finally we add 1 to account for the fact that line numbers start at 1, not 0.
                 line_number = y + self.buffer_y_scroll + 1
                 num_width = int(math.log10(line_number)) + 1
-                padding = " " * (self.buffer_config.x_start - num_width)
+                padding = " " * (self.display_config.x_start - num_width)
 
                 self.editor.stdscr.addstr(y, 0, f"{padding}{line_number}", self.editor.get_colour(self.colour_config.line_number_colour))
             else:
@@ -116,7 +116,7 @@ class Display:
             cursor_char = self.buffer.get_char(cursor_y, cursor_x)
 
         #When calculating the position of the cursor we must consider the current scroll of the buffer.
-        self.editor.stdscr.addstr(cursor_y - self.buffer_y_scroll, cursor_x + self.buffer_config.x_start - self.buffer_x_scroll, cursor_char, self.editor.get_colour(self.colour_config.cursor_colour))
+        self.editor.stdscr.addstr(cursor_y - self.buffer_y_scroll, cursor_x + self.display_config.x_start - self.buffer_x_scroll, cursor_char, self.editor.get_colour(self.colour_config.cursor_colour))
 
 
     #Assembles and displays the status-bar.
@@ -128,9 +128,9 @@ class Display:
         switch = False
 
         #This dictionary contains the name of the element in the configuration as keys and the function that gets that information as elements.
-        element_definitions = {"filename" : self.status_bar_functions.statusbar_filename(), "lines" : self.status_bar_functions.statusbar_lines(), "modified" : self.status_bar_functions.statusbar_modified(), "time" : self.status_bar_functions.statusbar_time(), "cursor" : self.status_bar_functions.statusbar_cursor()}
+        element_definitions = self.status_bar_functions.get_statusbar_functions()
 
-        #We go through every element in the configuration.
+        #We go through every element specified in the configuration file.
         for elem in self.statusbar_elements:
             #We use the "switch" variable to determine if we should add elements to the left or right of the status-bar.
             if switch:
@@ -143,7 +143,7 @@ class Display:
                 break
 
             #We get the corresponding value for the separator.
-            separator = self.buffer_config.statusbar_separators_definitions[self.statusbar_separators[separator_index]]
+            separator = self.display_config.statusbar_separators_definitions[self.statusbar_separators[separator_index]]
 
             #If the value is "(-1)" that means to switch from left to right.
             if separator == (-1):
@@ -165,7 +165,7 @@ class Display:
         assembled_statusbar = f"{statusbar_left}{separating_spaces}{statusbar_right}"
 
         #We print the status-bar.
-        self.editor.stdscr.addstr(self.editor.y_size + self.buffer_config.y_end, 0, assembled_statusbar, self.editor.get_colour(self.colour_config.status_bar_colour))
+        self.editor.stdscr.addstr(self.editor.y_size + self.display_config.y_end, 0, assembled_statusbar, self.editor.get_colour(self.colour_config.status_bar_colour))
 
 
     #Displays the prompt.
@@ -177,15 +177,15 @@ class Display:
     #Calculates the start position for printing the buffer.
     def calculate_x_start(self) -> None:
         #The number of characters required to display the maximum number of lines.
-        line_number_width = max(int(math.log10(self.buffer.get_line_count())) + 1, self.buffer_config.line_number_min_width)
+        line_number_width = max(int(math.log10(self.buffer.get_line_count())) + 1, self.display_config.line_number_min_width)
         #We set the x_start according to the width of the line number.
-        self.buffer_config.x_start = line_number_width
+        self.display_config.x_start = line_number_width
 
 
     #Handles the horizontal and vertical scroll for printing the appropriate part of the buffer depending on the position of the cursor. 
     def scroll_handler(self) -> None:
-        end_y = self.editor.y_size + self.buffer_config.y_end
-        end_x = self.editor.x_size + self.buffer_config.x_end
+        end_y = self.editor.y_size + self.display_config.y_end
+        end_x = self.editor.x_size + self.display_config.x_end
         cursor_y = self.cursor.get_y()
         cursor_x = self.cursor.get_x()
 
@@ -201,8 +201,8 @@ class Display:
 
         #Same concept except in the X axis, except that we also take into account the fact that "start_x" can be not zero, when the line
         #numbers are enabled.
-        if cursor_x > end_x - self.buffer_config.x_start + self.buffer_x_scroll - 1:
-            self.buffer_x_scroll = cursor_x - end_x + self.buffer_config.x_start + 1 
+        if cursor_x > end_x - self.display_config.x_start + self.buffer_x_scroll - 1:
+            self.buffer_x_scroll = cursor_x - end_x + self.display_config.x_start + 1 
         #If the cursor goes above the printed part of the buffer we set the scroll to the cursor's position, which is just enough for the cursor
         #to appear on the first line.
         elif cursor_x < self.buffer_x_scroll:

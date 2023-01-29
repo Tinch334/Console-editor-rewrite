@@ -126,7 +126,7 @@ class TextEditor(CursesUtils):
             for x in range(tabs_to_insert):
                 self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x() + x)
                 self.cursor.change_x_pos(True, self.buffer)
-
+                
         #####Cursor movement keys#####
         elif key == curses.KEY_RIGHT:
             self.cursor.change_x_pos(True, self.buffer)
@@ -267,4 +267,4 @@ class TextEditor(CursesUtils):
 
 
 editor = TextEditor()
-editor.text_editor();
+editor.text_editor()

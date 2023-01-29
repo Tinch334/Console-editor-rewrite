@@ -1,4 +1,5 @@
 import datetime
+from typing import Callable
 
 from buffer.buffer import TextBuffer
 from buffer.cursor import Cursor
@@ -11,6 +12,19 @@ class StatusbarFunctions:
             self.buffer = buffer
             self.cursor = cursor
             self.io = io
+
+    #Returns a dictionary that contains the name of the element in the configuration as keys and the function that gets that information as
+    #elements.
+    def get_statusbar_functions(self) -> dict[str, Callable]:
+        element_definitions = {
+            "filename" : self.statusbar_filename(),
+            "lines" : self.statusbar_lines(),
+            "modified" : self.statusbar_modified(),
+            "time" : self.statusbar_time(),
+            "cursor" : self.statusbar_cursor()
+        }
+
+        return element_definitions
 
 
     #Returns the name of the current filename.
