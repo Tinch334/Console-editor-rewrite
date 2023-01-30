@@ -1,4 +1,3 @@
-
 # Console-editor-rewrite
 A rewrite of my console editor written in Python using the curses library. The original version can be found [here](https://github.com/Tinch334/Console-editor).
 
@@ -45,11 +44,12 @@ Separators can be configured and expanded, you can add your own. All the separat
 The available separators:
 * ``\``: An empty separator, a space will be inserted between the elements.
 * ``-``: The string ``" - "`` will be inserted between the elements.
-* ``/``: The rest of the elements after this separator will be right aligned.
+* ``|``: The rest of the elements after this separator will be right aligned.
 
-**Note about '/' :** If you look at the value for `/` in the configuration file you will note that it's `-1`, this is what makes it the right align separator. You can change it to be whatever you like, however it's a bad idea to have more than one right align separator.
+**Note about '|' :** If you look at the value for `|` in the configuration file you will note that it's `-1`, this is what makes it the right align separator. You can change it to be whatever you like, however it's a bad idea to have more than one right align separator.
 
 ### Other configurations
 Currently there are two fields in the configuration file not related to colour:
-* `editor forget time`: It controls the time it takes the editor to "forget" something or return to it's normal state. For example this determines how long a non default prompt will stay.
+* `editor forget time`: It controls the time it takes the editor to "forget" something or return to its normal state. For example this determines how long a non default prompt will stay.
+* `tab size: 4` Determines the size of a tabulation, in spaces.
 * `scroll lines`: It controls how many lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.

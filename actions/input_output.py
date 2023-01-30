@@ -57,7 +57,7 @@ class IOHandler:
 
     #Takes a buffer and a filename, it then stores the file in the buffer, returns the number of bytes read if no errors occurred. If an error
     #occurred it returns "-1".
-    def load_file(self, buffer: type[TextBuffer], filename: str) -> list[Line]:
+    def load_file(self, buffer: type[TextBuffer], filename: str) -> list[Line] | int:
         #This try block is to avoid creating a security hole that might allow a user to access files without permission.
         try:
             path = os.path.join(os.getcwd(), filename)
