@@ -43,7 +43,7 @@ class TextEditor(CursesUtils):
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
         #Command help handler.
-        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
+        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count | Ctrl+F - find", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
 
@@ -305,7 +305,7 @@ class TextEditor(CursesUtils):
 
             #Set the display mode.
             self.display.display_mode_handler.set_highlight_display_mode(matches)
-            
+
         else:
             self.prompt.change_prompt(f"No matches found for \"{regex_to_find}\"")
 
