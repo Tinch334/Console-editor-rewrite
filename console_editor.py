@@ -84,8 +84,8 @@ class TextEditor(CursesUtils):
         if key >= 32 and key <= 253:
             self.buffer.add_char(chr(key), self.cursor.get_y(), self.cursor.get_x())
             self.cursor.change_x_pos(True, self.buffer)
-            #Since we've modified the buffer we set the dirty flag.
-            self.io.set_dirty()
+            #Since we've modified the buffer we call the appropriate function.
+            self.buffer_modified_handler()
 
         #Backspace
         elif key == curses.ascii.BS:
@@ -98,14 +98,14 @@ class TextEditor(CursesUtils):
             self.cursor.change_x_pos(False, self.buffer)
             self.buffer.delete_char(old_y, old_x)
 
-            #Since we've modified the buffer we set the dirty flag.
-            self.io.set_dirty()
+            #Since we've modified the buffer we call the appropriate function.
+            self.buffer_modified_handler()
 
         #Supr
         elif key == curses.KEY_DC:
             self.buffer.delete_char_forward(self.cursor.get_y(), self.cursor.get_x())
-            #Since we've modified the buffer we set the dirty flag.
-            self.io.set_dirty()
+            #Since we've modified the buffer we call the appropriate function.
+            self.buffer_modified_handler()
 
         #Enter, to detect it we use the ASCII "Carriage return(CR)" or "Line feed(LF)", both are included for compatibility reasons.
         elif key == curses.ascii.CR or key == curses.ascii.LF:
@@ -114,8 +114,8 @@ class TextEditor(CursesUtils):
             self.cursor.change_y_pos(1, self.buffer)
             #Set the cursor to the beginning of the new line.
             self.cursor.cursor_start()
-            #Since we've modified the buffer we set the dirty flag.
-            self.io.set_dirty()
+            #Since we've modified the buffer we call the appropriate function.
+            self.buffer_modified_handler()
 
 
         #Tab key.
@@ -131,8 +131,8 @@ class TextEditor(CursesUtils):
                 self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x() + x)
                 self.cursor.change_x_pos(True, self.buffer)
 
-            #Since we've modified the buffer we set the dirty flag.
-            self.io.set_dirty()
+            #Since we've modified the buffer we call the appropriate function.
+            self.buffer_modified_handler()
 
         #####Cursor movement keys#####
         elif key == curses.KEY_RIGHT:
@@ -191,6 +191,15 @@ class TextEditor(CursesUtils):
         #Ctrl+F -- Find
         elif key == ord("F") - 64:
             self.find()
+
+
+    #To be called every time the buffer is modified.
+    def buffer_modified_handler(self) -> None:
+        #Set the dirty flag.
+        self.io.set_dirty()
+        #Set the display mode to normal.
+        self.display.display_mode_handler.set_normal_display_mode()
+
 
     #Handles calling the I/O saving function and it's errors.
     def save_handler(self) -> None:
@@ -283,7 +292,21 @@ class TextEditor(CursesUtils):
         regex_to_find = self.basic_input.basic_input(self.y_size - 1, 0, "Regex to find: ")
         self.prompt.toggle_enabled()
 
-        raise Exception(self.find_in_buffer.find_in_buffer(regex_to_find))
+        #In case the user pressed "esc".
+        if regex_to_find == None:
+            return
+
+        matches = self.find_in_buffer.find_in_buffer(regex_to_find)
+
+        if matches != None:
+            #Calculate the number of matches and display it.
+            match_count = sum([len(a) for a in matches.values()])
+            self.prompt.change_prompt(f"Found {match_count} matches for \"{regex_to_find}\"")
+
+            #Set the display mode.
+            self.display.display_mode_handler.set_highlight_display_mode(matches)
+        else:
+            self.prompt.change_prompt(f"No matches found for \"{regex_to_find}\"")
 
 
 editor = TextEditor()

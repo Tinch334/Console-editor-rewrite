@@ -80,7 +80,7 @@ class Display:
             current_line = self.buffer.get_line(y)
 
             for x in range(self.buffer_x_scroll, len(current_line)):
-                self.display_mode_handler.display_char(display_y, display_x, current_line[x])
+                self.display_mode_handler.display_char(display_y, display_x, y, x, current_line[x])
     
                 #X printing index check.
                 display_x += 1
