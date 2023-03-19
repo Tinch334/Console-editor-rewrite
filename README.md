@@ -17,6 +17,7 @@ To access editor functions keyboard shortcuts are used, for now they can't be co
 * `Ctrl+A`: Show command help, pressing this will display all available commands on the prompt, note that it has multiple pages that can be accessed by pressing multiple times.
 * `Ctrl+G`: Goto line, moves the cursor to the specified line, if it exists.
 * `Ctrl+W`: Counts the number of words, alphanumeric characters, in the file.
+* `Ctrl+F`: Find function, accepts strings as well as regex.
 
 ## Configuration file
 The editor has a configuration file, in YAML. Note that giving fields improper values may break the editor or cause it to not work.

@@ -305,6 +305,7 @@ class TextEditor(CursesUtils):
 
             #Set the display mode.
             self.display.display_mode_handler.set_highlight_display_mode(matches)
+            
         else:
             self.prompt.change_prompt(f"No matches found for \"{regex_to_find}\"")
 
