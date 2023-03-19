@@ -9,6 +9,7 @@ from configuration.config import ConfigurationHandler
 from actions.prompt import Prompt
 from actions.command_help import CommandHelp
 from actions.basic_input import BasicInput
+from actions.find import FindInBuffer
 
 
 class TextEditor(CursesUtils):
@@ -28,6 +29,7 @@ class TextEditor(CursesUtils):
         self.config = ConfigurationHandler()
         #The editor's configuration.
         self.editor_config = self.config.get_editor_config()
+
         #The text buffer handler.
         self.buffer = TextBuffer()
         #The cursor handler.
@@ -40,8 +42,10 @@ class TextEditor(CursesUtils):
         self.display = Display(self, self.buffer, self.cursor, self.prompt, self.io, self.config.get_display_config(), self.config.get_display_colour_config())
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
-        #Command help handler
+        #Command help handler.
         self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
+        #Find in buffer.
+        self.find_in_buffer = FindInBuffer(self.buffer)
 
 
     def text_editor(self) -> None:
@@ -127,6 +131,9 @@ class TextEditor(CursesUtils):
                 self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x() + x)
                 self.cursor.change_x_pos(True, self.buffer)
 
+            #Since we've modified the buffer we set the dirty flag.
+            self.io.set_dirty()
+
         #####Cursor movement keys#####
         elif key == curses.KEY_RIGHT:
             self.cursor.change_x_pos(True, self.buffer)
@@ -183,8 +190,7 @@ class TextEditor(CursesUtils):
 
         #Ctrl+F -- Find
         elif key == ord("F") - 64:
-            pass
-
+            self.find()
 
     #Handles calling the I/O saving function and it's errors.
     def save_handler(self) -> None:
@@ -268,6 +274,16 @@ class TextEditor(CursesUtils):
                     words += 1
 
         self.prompt.change_prompt(f"There are {words} words in the current file")
+
+
+    #Finds all the matches for the given regex, then highlights the matches.
+    def find(self) -> None:
+        #Disable the prompt, get input and then re-enable the prompt.
+        self.prompt.toggle_enabled()
+        regex_to_find = self.basic_input.basic_input(self.y_size - 1, 0, "Regex to find: ")
+        self.prompt.toggle_enabled()
+
+        raise Exception(self.find_in_buffer.find_in_buffer(regex_to_find))
 
 
 editor = TextEditor()

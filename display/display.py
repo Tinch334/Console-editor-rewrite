@@ -4,6 +4,7 @@ from typing import Any
 from buffer.buffer import TextBuffer
 from buffer.cursor import Cursor
 from display.status_bar_functions import StatusbarFunctions
+from display.display_modes import DisplayModeHandler
 from actions.prompt import Prompt
 from actions.input_output import IOHandler
 from configuration.config import DisplayConfig, DisplayColourConfig
@@ -24,6 +25,10 @@ class Display:
         #This class contains all the functions for the status-bar.
         self.status_bar_functions = StatusbarFunctions(self.buffer, self.cursor, self.io)
 
+        #Display mode, determines how the text is displayed.
+        self.display_mode_handler = DisplayModeHandler(self.colour_config, self.editor)
+
+
         #These two variables determine the scroll of the buffer. What this does is determine at which index the contents of the editor should
         #start being printed. For example a "buffer_y_scroll" of 5 means that the first 5 lines would not be displayed.
         self.buffer_y_scroll = 0
@@ -38,10 +43,11 @@ class Display:
         self.setup()
 
 
-    #Gets the value of variables that won't change during runtime.
+    #Gets the value of variables that won't change during runtime and configures initial values for others.
     def setup(self) -> None:
         self.statusbar_elements = re.split(f"[{self.display_config.statusbar_separators_definitions}]", self.display_config.statusbar_config)
         self.statusbar_separators = re.findall(f"[{self.display_config.statusbar_separators_definitions}]", self.display_config.statusbar_config)
+        self.display_mode_handler.set_normal_display_mode()
 
 
     #This function calls all the different display functions, it's the one that should be called from the editor.
@@ -74,7 +80,7 @@ class Display:
             current_line = self.buffer.get_line(y)
 
             for x in range(self.buffer_x_scroll, len(current_line)):
-                self.editor.stdscr.addstr(display_y, display_x, current_line[x], self.editor.get_colour(self.colour_config.text_colour))
+                self.display_mode_handler.display_char(display_y, display_x, current_line[x])
     
                 #X printing index check.
                 display_x += 1

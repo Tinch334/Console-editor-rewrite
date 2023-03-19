@@ -34,6 +34,7 @@ class DisplayConfig:
 @dataclass
 class DisplayColourConfig:
     text_colour = None
+    highlight_colour = None
     cursor_colour = None
     line_number_colour = None
     empty_line_number_colour = None
@@ -88,6 +89,7 @@ class ConfigurationHandler:
     def get_display_colour_config(self) -> DisplayColourConfig:
         config = DisplayColourConfig()
         config.text_colour = self.config_file["display colour"]["text colour"]
+        config.highlight_colour = self.config_file["display colour"]["highlight colour"]
         config.cursor_colour = self.config_file["display colour"]["cursor colour"]
         config.line_number_colour = self.config_file["display colour"]["line number colour"]
         config.empty_line_number_colour = self.config_file["display colour"]["empty line number colour"]

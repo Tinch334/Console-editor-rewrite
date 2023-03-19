@@ -16,6 +16,7 @@ display behaviour:
 
 display colour:
   text colour: "WHITE_BLACK" #Colour of the text normally.
+  highlight colour: "WHITE_BLUE" #Colour of highlighted text.
   cursor colour: "BLACK_WHITE" #Colour of the cursor and text under the cursor.
   line number colour: "BLACK_WHITE" #Colour of the line number bar.
   empty line number colour: "WHITE_BLACK" #Colour of a line without a number, they are the ones that have a "~" instead of a number.
