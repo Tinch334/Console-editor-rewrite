@@ -6,7 +6,6 @@ class DisplayModesEnum(Enum):
     HIGHLIGHT = auto()
 
 
-
 class DisplayModeHandler:
     def __init__(self, colour_config, editor):
         self.colour_config = colour_config
