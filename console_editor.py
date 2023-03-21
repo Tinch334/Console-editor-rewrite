@@ -10,6 +10,7 @@ from actions.prompt import Prompt
 from actions.command_help import CommandHelp
 from actions.basic_input import BasicInput
 from actions.find import FindInBuffer
+from actions.undo import Undo
 
 
 class TextEditor(CursesUtils):
@@ -46,6 +47,11 @@ class TextEditor(CursesUtils):
         self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count | Ctrl+F - find", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
+        #Undo.
+        self.undo_handler = Undo(3, 15)
+
+        #We store the empty buffer with the cursor at (0, 0) so the user can undo to an empty buffer.
+        self.undo_handler.undo_handler(self.buffer, self.cursor)
 
 
     def text_editor(self) -> None:
@@ -160,8 +166,8 @@ class TextEditor(CursesUtils):
             self.cursor.cursor_scroll(False, self.buffer)
 
         #####"CTRL" keys#####
-        #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value
-        #returned when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
+        #To detect keys pressed in conjunction with "Ctrl" we check for the uppercase ASCII value of the key minus 64, which is the value returned
+        #when pressing a key plus "Ctrl". For example pressing CTRL+E would get a keycode of 5.
         #Ctrl+S -- Save
         elif key == ord("S") - 64:
             self.save_handler()
@@ -192,6 +198,10 @@ class TextEditor(CursesUtils):
         elif key == ord("F") - 64:
             self.find()
 
+        #Ctrl+Z -- Undo
+        elif key == ord("Z") - 64:
+            self.undo()    
+
 
     #To be called every time the buffer is modified.
     def buffer_modified_handler(self) -> None:
@@ -199,6 +209,8 @@ class TextEditor(CursesUtils):
         self.io.set_dirty()
         #Set the display mode to normal.
         self.display.display_mode_handler.set_normal_display_mode()
+        #The undo handler has to be called every time the buffer is modified.
+        self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
 
 
     #Handles calling the I/O saving function and it's errors.
@@ -308,6 +320,19 @@ class TextEditor(CursesUtils):
 
         else:
             self.prompt.change_prompt(f"No matches found for \"{regex_to_find}\"")
+
+
+    #Reverts the editor to the last snapshot, undos the last actions.
+    def undo(self) -> None:
+        undo_result = self.undo_handler.get_undo()
+
+        if undo_result == None:
+            self.prompt.change_prompt("Nothing to undo")
+        else:
+            #Sets the buffer and cursor from the undo results.
+            self.buffer.set_buffer(undo_result[0])
+            self.cursor.set_cursor_value(undo_result[1])
+
 
 
 editor = TextEditor()

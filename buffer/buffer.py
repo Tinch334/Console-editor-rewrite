@@ -12,8 +12,8 @@ class TextBuffer:
         self.buffer = [Line()]
 
     #####USE NOTE#####
-    #All the functions in this dataclass use indexes starting at zero. Furthermore when referring to the "x_pos" in a line it must be thought of
-    #as if it were a cursor. What this means is that an "x_pos" of zero would be at the very start of the line, NOT the first character.
+    #All the functions in this dataclass use indexes starting at zero. Furthermore when referring to the "x_pos" in a line it must be thought of as if
+    #it were a cursor. What this means is that an "x_pos" of zero would be at the very start of the line, NOT the first character.
 
 
     #Adds a character in the specified position in the buffer, returns "True" if no errors occurred.
@@ -34,8 +34,8 @@ class TextBuffer:
     #Deletes the character behind the cursor, returns "True" if no errors occurred.
     def delete_char(self, y_pos: int, x_pos: int) -> bool:
         try:
-            #If we delete the first position of a line we simply append it to the line above, if there's one. This also works for deleting
-            #empty lines, since we are appending an empty string.
+            #If we delete the first position of a line we simply append it to the line above, if there's one. This also works for deleting empty
+            #lines, since we are appending an empty string.
             if x_pos == 0:
                 if y_pos > 0:
                     self.buffer[y_pos - 1].contents += self.buffer[y_pos].contents
@@ -68,15 +68,15 @@ class TextBuffer:
             return False
 
 
-    #Inserts a newline behind the cursor, returns "True" if no errors occurred. Note that newline doesn't refer to the newline character "\n"
-    #but to what would happen when pressing enter on a regular editor.
+    #Inserts a newline behind the cursor, returns "True" if no errors occurred. Note that newline doesn't refer to the newline character "\n" but to
+    #what would happen when pressing enter on a regular editor.
     def newline(self, y_pos: int, x_pos: int) -> bool:
         try:
             #Insert a new line right after the current one.
             self.buffer.insert(y_pos + 1, Line())
 
-            #If the current line isn't empty we slice it, leaving everything behind the cursor on it and putting everything in front of it in 
-            #the new line.
+            #If the current line isn't empty we slice it, leaving everything behind the cursor on it and putting everything in front of it in the new
+            #line.
             if (len(self.buffer[y_pos].contents)) != 0:
                 self.buffer[y_pos + 1].contents = self.buffer[y_pos].contents[x_pos:]
                 self.buffer[y_pos].contents = self.buffer[y_pos].contents[:x_pos]
@@ -109,6 +109,9 @@ class TextBuffer:
     def get_line_count(self) -> int:
         return len(self.buffer)
 
+    #Returns the entire buffer, used for the undo function.
+    def get_buffer(self) -> list[Line]:
+        return self.buffer
 
     #Receives a list of lines and sets that as the buffer, it's used for opening files.
     def set_buffer(self, buffer: list[Line]) -> None:

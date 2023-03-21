@@ -1,5 +1,15 @@
+from dataclasses import dataclass
+
 from buffer.buffer import TextBuffer
 from configuration.config import CursorConfig
+
+
+@dataclass
+class CursorInfo:
+    x_pos: int = 0
+    y_pos: int = 0
+    
+    _desired_x_pos: int = -1
 
 
 class Cursor:
@@ -7,9 +17,9 @@ class Cursor:
         self.y_pos = 0
         self.x_pos = 0
 
-        #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line
-        #and the line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to
-        #"-1" to allow for easy and always false comparisons using "max".
+        #This variables stores the X position the cursor would like to be in, it's used when moving vertically from one line to another line and the
+        #line we are moving to isn't long enough for the cursor to have it's previous horizontal position. When not in use it's set to "-1" to allow
+        #for easy and always false comparisons using "max".
         self._desired_x_pos = -1
 
         self.config = config
@@ -23,8 +33,23 @@ class Cursor:
         return self.x_pos
 
 
-    #Changes the X position of the cursor, if "change" is "True" then the cursor is moved one position to the right, otherwise it's moved one
-    #position to the left.
+    #Returns all cursor values as a "CursorInfo" dataclass, for use in the undo function.
+    def get_cursor_value(self) -> type[CursorInfo]:
+        cursor_info = CursorInfo(self.x_pos, self.y_pos, self._desired_x_pos)
+
+        return cursor_info
+
+    
+    #Sets all cursor values from a "CursorInfo" dataclass.
+    def set_cursor_value(self, cursor_info: type[CursorInfo]):
+        self.y_pos = cursor_info.y_pos
+        self.x_pos = cursor_info.x_pos
+
+        self._desired_x_pos = cursor_info._desired_x_pos
+
+
+    #Changes the X position of the cursor, if "change" is "True" then the cursor is moved one position to the right, otherwise it's moved one position
+    #to the left.
     def change_x_pos(self, change: bool, buffer: type[TextBuffer]) -> bool:
         try:
             new_pos = self.x_pos + (1 if change else -1)
@@ -53,8 +78,8 @@ class Cursor:
             return False
 
 
-    #Changes the Y position of the cursor, the "change" can be both positive or negative. A reference to the buffer is required for the function
-    #to work. Returns "True" if no errors occurred.
+    #Changes the Y position of the cursor, the "change" can be both positive or negative. A reference to the buffer is required for the function to
+    #work. Returns "True" if no errors occurred.
     def change_y_pos(self, change: int, buffer: type[TextBuffer]) -> bool:
         new_pos = self.y_pos + change
 

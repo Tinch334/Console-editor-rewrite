@@ -27,7 +27,7 @@ class IOHandler:
 
 
     #Takes a buffer and saves it to the specified "filename", returns the number of bytes written if no errors occurred. If an error occurred it
-    # returns "-1".
+    #returns "-1".
     def save_file(self, buffer: type[TextBuffer], filename: str, line_ending: str = "\n") -> int:
         #This try block is to avoid creating a security hole that might allow a user to access files without permission.
         try:
