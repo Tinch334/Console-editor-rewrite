@@ -1,4 +1,4 @@
-import curses, curses.ascii, os.path
+import curses, curses.ascii, os.path, copy
 
 from actions.utils import CursesUtils
 from buffer.buffer import TextBuffer
@@ -51,7 +51,7 @@ class TextEditor(CursesUtils):
         self.undo_handler = Undo(3, 15)
 
         #We store the empty buffer with the cursor at (0, 0) so the user can undo to an empty buffer.
-        self.undo_handler.undo_handler(self.buffer, self.cursor)
+        self.undo_handler.undo_handler(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
 
 
     def text_editor(self) -> None:
@@ -210,7 +210,7 @@ class TextEditor(CursesUtils):
         #Set the display mode to normal.
         self.display.display_mode_handler.set_normal_display_mode()
         #The undo handler has to be called every time the buffer is modified.
-        self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
+        self.undo_handler.undo_handler(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
 
 
     #Handles calling the I/O saving function and it's errors.
