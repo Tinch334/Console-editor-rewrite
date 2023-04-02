@@ -26,23 +26,14 @@ class Undo:
 
     #Must be called every time the buffer is modified.
     def undo_handler(self, buffer_value: type[TextBuffer], cursor_value: type[Cursor]) -> None:
-        buffer_and_cursor = (buffer_value, cursor_value)
-
         #The last modification occurred more than "self.snapshot_time" seconds ago, we store a new snapshot.
+        #           15                      3               1
         if self.last_snapshot_time + self.snapshot_time <= time.time():
-            if self.undo_to_add != None:
-                #If the stack is already at it's max length we remove the oldest element in the stack by popping left, to maintain the stacks size.
-                if len(self.undo_stack) >= self.max_stack_length:
-                    self.undo_stack.popleft()
-            
-                #We add the previous action to the undo stack.
-                self.undo_stack.append(self.undo_to_add)
+            #If the stack is already at it's max length we remove the oldest element in the stack by popping left, to maintain the stacks size.
+            if len(self.undo_stack) >= self.max_stack_length:
+                self.undo_stack.popleft()
 
-            #We make the current action the one to add the next time a new element is pushed onto the stack.
-            self.undo_to_add = buffer_and_cursor
-
-            #Set the current time for the snapshot.
-            self.last_snapshot_time = time.time()
+            self.add_undo(buffer_value, cursor_value)
 
         #Otherwise we replace the last snapshot with the latest changes, since not enough time has passed for a new snapshot. Since we can't replace an
         #element in a "deque" we pop the last element an push the new state.
@@ -51,14 +42,28 @@ class Undo:
             if len(self.undo_stack) > 0:
                 self.undo_stack.pop()
 
-            self.undo_stack.append(buffer_and_cursor)
+            self.add_undo(buffer_value, cursor_value)
+
+        #Set the current time for the snapshot.
+        self.last_snapshot_time = time.time()
+
+
+    #Adds actions to the stack using a buffer.
+    def add_undo(self, buffer_value: type[TextBuffer], cursor_value: type[Cursor]) -> None:
+        buffer_and_cursor = (buffer_value, cursor_value)
+
+        if self.undo_to_add != None:
+            #We add the previous action to the undo stack.
+            self.undo_stack.append(self.undo_to_add)
+
+        #We make the current action the one to add the next time a new element is pushed onto the stack.
+        self.undo_to_add = buffer_and_cursor
 
 
     #Returns a tuple with the last buffer and cursor stored in the undo stack, returns "None" if the stack is empty.
     def get_undo(self) -> Optional[tuple[type[TextBuffer], type[Cursor]]]:
         #Make sure there's an element to pop.
         if len(self.undo_stack) > 0:
-            self.undo_stack.pop()
             return self.undo_stack.pop()
         else:
             return None

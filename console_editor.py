@@ -51,7 +51,7 @@ class TextEditor(CursesUtils):
         self.undo_handler = Undo(3, 15)
 
         #We store the empty buffer with the cursor at (0, 0) so the user can undo to an empty buffer.
-        self.undo_handler.undo_handler(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
+        self.undo_handler.add_undo(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
 
 
     def text_editor(self) -> None:
