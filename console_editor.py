@@ -48,10 +48,10 @@ class TextEditor(CursesUtils):
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
         #Undo.
-        self.undo_handler = Undo(3, 15)
+        self.undo_handler = Undo(1, 15)
 
         #We store the empty buffer with the cursor at (0, 0) so the user can undo to an empty buffer.
-        self.undo_handler.add_undo(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
+        self.undo_handler.add_undo(self.buffer.get_buffer(), self.cursor.get_cursor_value())
 
 
     def text_editor(self) -> None:
@@ -209,8 +209,8 @@ class TextEditor(CursesUtils):
         self.io.set_dirty()
         #Set the display mode to normal.
         self.display.display_mode_handler.set_normal_display_mode()
-        #The undo handler has to be called every time the buffer is modified.
-        self.undo_handler.undo_handler(copy.deepcopy(self.buffer.get_buffer()), self.cursor.get_cursor_value())
+        #The undo handler needs to be called every time the buffer is modified.
+        self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
 
 
     #Handles calling the I/O saving function and it's errors.
