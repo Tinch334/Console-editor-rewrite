@@ -324,9 +324,7 @@ class TextEditor(CursesUtils):
     def undo(self) -> None:
         undo_result = self.undo_handler.get_undo()
 
-        if undo_result == None:
-            self.prompt.change_prompt("Nothing to undo")
-        else:
+        if undo_result != None:
             #Sets the buffer and cursor from the undo results.
             self.buffer.set_buffer(undo_result[0])
             self.cursor.set_cursor_value(undo_result[1])
