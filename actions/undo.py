@@ -20,44 +20,64 @@ class Undo:
 
         #Time when the last snapshot was taken.     
         self.last_snapshot_time = 0
+        #Whether there's an action that needs to be saved.
+        self.action_to_save = False
+
+
+    #This function has to be called every time there's an action that needs to be saved in the undo stack, that way when the "undo_handler" is called
+    #in the program loop.
+    def set_undo(self) -> None:
+        self.action_to_save = True
 
 
     #Must be called every time the buffer is modified.
     def undo_handler(self, buffer_value: type[TextBuffer], cursor_value: type[Cursor]) -> None:
-        self.action_to_save = False
+        #If the undo stack is empty that means we have either loaded a new file or emptied the queue, to allow the user to undo to this state we add it
+        #to the stack.
+        if len(self.undo_stack) == 0:
+            self._add_undo(buffer_value, cursor_value)
+            #When we are storing the base state of the buffer we don't want it to be popped if the user performs an action quickly, therefore we set
+            #"last_snapshot_time" to zero, to force a new element to be added to the undo stack. Whilst a flag could be used it would add unnecessary
+            #clutter.
+            self.last_snapshot_time = 0
 
-        #The last modification occurred more than "self.snapshot_time" seconds ago, we store a new snapshot.
-        if self.last_snapshot_time + self.snapshot_time <= time.time():
-            #If the stack is already at it's max length we remove the oldest element in the stack by popping left, to maintain the stacks size.
-            if len(self.undo_stack) >= self.max_stack_length:
-                self.undo_stack.popleft()
+            return
 
-        #Otherwise we replace the last snapshot with the latest changes, since not enough time has passed for a new snapshot. Since we can't
-        #replace an element in a "deque" we pop the last element an push the new state.
-        else:
-            #Make sure there's an element to pop.
-            if len(self.undo_stack) > 0:
-                self.undo_stack.pop()
+        if self.action_to_save:
+            #We are saving whatever action caused the flag to be true, we reset it.
+            self.action_to_save = False
 
-        self.add_undo(buffer_value, cursor_value)
+            #If the last modification occurred less than "self.snapshot_time" seconds ago, we overwrite the last snapshot, to allow the user to undo
+            #actions that occurred close together all at once.
+            if not self.last_snapshot_time + self.snapshot_time <= time.time():
+                #Make sure there's an element to pop.
+                if len(self.undo_stack) > 0:
+                    self.undo_stack.pop()
 
-        #Set the current time for the snapshot.
-        self.last_snapshot_time = time.time()
+            self._add_undo(buffer_value, cursor_value)
+
+            #Set the current time for the snapshot.
+            self.last_snapshot_time = time.time()
 
 
-    def add_undo(self, buffer_value: type[TextBuffer], cursor_value: type[Cursor]) -> None:
+    #Adds an action to the undo stack.
+    def _add_undo(self, buffer_value: type[TextBuffer], cursor_value: type[Cursor]) -> None:
+        #If the stack is already at it's max length we remove the oldest element in the stack by popping left, to maintain the stack's size.
+        if len(self.undo_stack) >= self.max_stack_length:
+            self.undo_stack.popleft()
+
         buffer_and_cursor = (deepcopy(buffer_value), cursor_value)
         self.undo_stack.append(buffer_and_cursor)
         
 
     #Returns a tuple with the last buffer and cursor stored in the undo stack, returns "None" if the stack is empty.
     def get_undo(self) -> Optional[tuple[type[TextBuffer], type[Cursor]]]:
-        #raise Exception(self.undo_stack)
-
         if len(self.undo_stack) > 1:
+            #We pop the last element in the undo stack, which corresponds to the current buffer state.
             self.undo_stack.pop()
             return self.undo_stack.pop()
         elif len(self.undo_stack) == 1:
+            #If there's only one element left in the queue that means it's the base state of the buffer, we simply return it.
             return self.undo_stack.pop()
         else:
             return None

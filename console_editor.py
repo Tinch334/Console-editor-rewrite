@@ -1,4 +1,4 @@
-import curses, curses.ascii, os.path, copy
+import curses, curses.ascii, os.path
 
 from actions.utils import CursesUtils
 from buffer.buffer import TextBuffer
@@ -48,10 +48,7 @@ class TextEditor(CursesUtils):
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
         #Undo.
-        self.undo_handler = Undo(1, 15)
-
-        #We store the empty buffer with the cursor at (0, 0) so the user can undo to an empty buffer.
-        self.undo_handler.add_undo(self.buffer.get_buffer(), self.cursor.get_cursor_value())
+        self.undo_handler = Undo(0.5, 15)
 
 
     def text_editor(self) -> None:
@@ -68,6 +65,7 @@ class TextEditor(CursesUtils):
             #Call all handlers.
             self.prompt.prompt_handler()
             self.command_help.help_line_handler()
+            self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
 
             #Get console size.
             self.get_size()
@@ -200,7 +198,7 @@ class TextEditor(CursesUtils):
 
         #Ctrl+Z -- Undo
         elif key == ord("Z") - 64:
-            self.undo()    
+            self.undo()
 
 
     #To be called every time the buffer is modified.
@@ -209,8 +207,8 @@ class TextEditor(CursesUtils):
         self.io.set_dirty()
         #Set the display mode to normal.
         self.display.display_mode_handler.set_normal_display_mode()
-        #The undo handler needs to be called every time the buffer is modified.
-        self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
+        #Since the buffer has been modified we want to add these changes to the undo stack.
+        self.undo_handler.set_undo()
 
 
     #Handles calling the I/O saving function and it's errors.
