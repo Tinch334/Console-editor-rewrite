@@ -7,6 +7,8 @@ from dataclasses import dataclass
 class EditorConfig:
     forget_time: int = None
     tab_size: int = None
+    undo_separation_time: float = None
+    max_undo_states: int = None
 
 
 #Configuration for the cursor.
@@ -63,6 +65,8 @@ class ConfigurationHandler:
         config = EditorConfig()
         config.forget_time = config.editor_forget_time = self.config_file["editor behaviour"]["editor forget time"]
         config.tab_size = self.config_file["editor behaviour"]["tab size"]
+        config.undo_separation_time = self.config_file["editor behaviour"]["undo separation time"]
+        config.max_undo_states = self.config_file["editor behaviour"]["max undo states"]
 
         return config
 

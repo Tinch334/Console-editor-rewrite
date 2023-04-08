@@ -48,7 +48,7 @@ class TextEditor(CursesUtils):
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
         #Undo.
-        self.undo_handler = Undo(0.5, 15)
+        self.undo_handler = Undo(self.editor_config.undo_separation_time, self.editor_config.max_undo_states)
 
 
     def text_editor(self) -> None:

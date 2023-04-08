@@ -52,5 +52,7 @@ The available separators:
 ### Other configurations
 Currently there are two fields in the configuration file not related to colour:
 * `editor forget time`: It controls the time it takes the editor to "forget" something or return to its normal state. For example this determines how long a non default prompt will stay.
-* `tab size: 4` Determines the size of a tabulation, in spaces.
+* `tab size` Determines the size of a tabulation, in spaces.
+* `undo separation time`: The time (in seconds) that separates one undo from another. What this means in practice is that any two actions performed within less that this time will be undone with a single undo.
+* `max undo states`: The maximum number of undos the editor stores, keep in mind that each can consume a non-trivial amount of RAM on larger files.
 * `scroll lines`: It controls how many lines the editor scrolls vertically when the "PgUp" or "PgDown" key is pressed.
