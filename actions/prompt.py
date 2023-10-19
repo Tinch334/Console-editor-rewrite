@@ -36,7 +36,7 @@ class Prompt:
         self.current_reset_time = time.time()
 
 
-    #Checks if the prompt should be reset to the default prompt.
+    #Checks if the prompt should be reset to the default prompt, should be called every editor loop..
     def prompt_handler(self) -> None:
         if time.time() >= self.current_reset_time + self.prompt_reset_time:
             self.current_prompt = self.default_prompt

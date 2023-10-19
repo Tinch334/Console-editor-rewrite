@@ -1,6 +1,7 @@
 ---
 editor behaviour:
-  editor forget time: 4 #The time it takes the editor to "forget" something, an input, a prompt, etc.
+  forget time: 4 #The time it takes the editor to "forget" something , an input, a prompt, etc. It's measured in seconds.
+  confirmation count: 3 #The number of times an action need to be repeated to be confirmed.
   tab size: 4 #The size of a tabulation, in spaces.
   undo separation time: 0.5 #The time (in seconds) that separates one undo from another.
   max undo states: 10 #The maximum number of undos that are stored by the editor.

@@ -13,7 +13,7 @@ To run the editor first ensure that all the editor folders are in the same folde
 To access editor functions keyboard shortcuts are used, for now they can't be configured. They are:
 * `Ctrl+S`: Save file, if a filename is specified the file will be saved to it, otherwise the editor will prompt the user for one. The editor **will** overwrite existing files if you choose to save with the name of an already existing file.
 * `Ctrl+O`: Open file, the editor will prompt the user for the file to open. The editor will discard all unsaved changes when opening a file.
-* `Ctrl+Q`: Quit, exits the editor. The editor will discard all unsaved changes when exiting a file.
+* `Ctrl+Q`: Quit, exits the editor. The editor will show a prompt if there are unsaved changes.
 * `Ctrl+A`: Show command help, pressing this will display all available commands on the prompt, note that it has multiple pages that can be accessed by pressing multiple times.
 * `Ctrl+G`: Goto line, moves the cursor to the specified line, if it exists.
 * `Ctrl+W`: Counts the number of words, alphanumeric characters, in the file.
@@ -51,7 +51,8 @@ The available separators:
 
 ### Other configurations
 Currently there are two fields in the configuration file not related to colour:
-* `editor forget time`: It controls the time it takes the editor to "forget" something or return to its normal state. For example this determines how long a non default prompt will stay.
+* `forget time`: It controls the time it takes the editor to "forget" something or return to its normal state. For example this determines how long a non default prompt will stay.
+* `confirmation count`: The number of times an action must be performed to confirm it.
 * `tab size` Determines the size of a tabulation, in spaces.
 * `undo separation time`: The time (in seconds) that separates one undo from another. What this means in practice is that any two actions performed within less that this time will be undone with a single undo.
 * `max undo states`: The maximum number of undos the editor stores, keep in mind that each can consume a non-trivial amount of RAM on larger files.

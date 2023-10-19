@@ -6,6 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class EditorConfig:
     forget_time: int = None
+    confirmation_count: int = None
     tab_size: int = None
     undo_separation_time: float = None
     max_undo_states: int = None
@@ -63,7 +64,8 @@ class ConfigurationHandler:
     #Returns a "EditorConfig" dataclass with the values from the configuration file.
     def get_editor_config(self) -> EditorConfig:
         config = EditorConfig()
-        config.forget_time = config.editor_forget_time = self.config_file["editor behaviour"]["editor forget time"]
+        config.forget_time = self.config_file["editor behaviour"]["forget time"]
+        config.confirmation_count = self.config_file["editor behaviour"]["confirmation count"]
         config.tab_size = self.config_file["editor behaviour"]["tab size"]
         config.undo_separation_time = self.config_file["editor behaviour"]["undo separation time"]
         config.max_undo_states = self.config_file["editor behaviour"]["max undo states"]

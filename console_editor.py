@@ -11,6 +11,7 @@ from actions.command_help import CommandHelp
 from actions.basic_input import BasicInput
 from actions.find import FindInBuffer
 from actions.undo import Undo
+from actions.time_counter import TimeCounter
 
 
 class TextEditor(CursesUtils):
@@ -44,11 +45,13 @@ class TextEditor(CursesUtils):
         #Basic input handler.
         self.basic_input = BasicInput(self, self.config.get_display_colour_config())
         #Command help handler.
-        self.command_help = CommandHelp(["Ctrl+G - goto line | Ctrl+W - word count | Ctrl+F - find", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
+        self.command_help = CommandHelp(["Ctrl+Z - undo | Ctrl+F - find | Ctrl+G - goto line | Ctrl+W - word count", "Consectetur adipiscing elit. Nulla non neque rutrum lacus dapibus lobortis.", "Maecenas lobortis nibh massa, in varius leo auctor eget"], self.editor_config.forget_time)
         #Find in buffer.
         self.find_in_buffer = FindInBuffer(self.buffer)
-        #Undo.
+        #Undo handler.
         self.undo_handler = Undo(self.editor_config.undo_separation_time, self.editor_config.max_undo_states)
+        #COunter for the quit function.
+        self.quit_counter = TimeCounter(self.editor_config.confirmation_count, self.editor_config.forget_time)
 
 
     def text_editor(self) -> None:
@@ -66,13 +69,17 @@ class TextEditor(CursesUtils):
             self.prompt.prompt_handler()
             self.command_help.help_line_handler()
             self.undo_handler.undo_handler(self.buffer.get_buffer(), self.cursor.get_cursor_value())
+            self.quit_counter.quit_counter_handler()
 
             #Get console size.
             self.get_size()
             #Refresh the screen.
             self.stdscr.refresh()
             #Gets the pressed key code.
-            self.key = self.stdscr.getch()
+            try:
+                self.key = self.stdscr.getch()
+            except:
+                self.key = -1
 
 
     def get_input(self) -> None:
@@ -121,7 +128,6 @@ class TextEditor(CursesUtils):
             #Since we've modified the buffer we call the appropriate function.
             self.buffer_modified_handler()
 
-
         #Tab key.
         elif key == curses.ascii.TAB:
             tab_size = self.editor_config.tab_size
@@ -132,7 +138,7 @@ class TextEditor(CursesUtils):
             #Since there's no function in the buffer to insert a string we just add the space characters one by one, whilst moving the cursor
             #at the same time.
             for x in range(tabs_to_insert):
-                self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x() + x)
+                self.buffer.add_char(" ", self.cursor.get_y(), self.cursor.get_x())
                 self.cursor.change_x_pos(True, self.buffer)
 
             #Since we've modified the buffer we call the appropriate function.
@@ -188,9 +194,7 @@ class TextEditor(CursesUtils):
 
         #Ctrl+Q -- Quit
         elif key == ord("Q") - 64:
-            #Properly terminate curses and exit the program.
-            curses.endwin()            
-            quit()
+            self.quit()
 
         #Ctrl+F -- Find
         elif key == ord("F") - 64:
@@ -200,7 +204,6 @@ class TextEditor(CursesUtils):
         elif key == ord("Z") - 64:
             self.undo()
 
-
     #To be called every time the buffer is modified.
     def buffer_modified_handler(self) -> None:
         #Set the dirty flag.
@@ -209,6 +212,24 @@ class TextEditor(CursesUtils):
         self.display.display_mode_handler.set_normal_display_mode()
         #Since the buffer has been modified we want to add these changes to the undo stack.
         self.undo_handler.set_undo()
+
+
+    #Handles properly quitting the editor.
+    def quit(self) -> None:
+        #Check if there's unsaved work.
+        if self.io.get_dirty():
+            if self.quit_counter.check_count():
+                #Properly terminate curses and exit the program.
+                curses.endwin()
+                quit()
+            else:
+                #Show prompt indicating the need to repeat the keypress.
+                self.prompt.change_prompt(f"Please press Ctrl+Q {self.quit_counter.get_remaining_counts()} more times to exit")
+
+        else:
+            #Properly terminate curses and exit the program.
+            curses.endwin()
+            quit()
 
 
     #Handles calling the I/O saving function and it's errors.
